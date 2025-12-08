@@ -1,0 +1,64 @@
+{
+  "models": {
+    "sd_xl_base_1.0": {
+      "path": "/workspace/models/checkpoints/sd_xl_base_1.0.safetensors",
+      "type": "checkpoint",
+      "architecture": "sdxl",
+      "vae": "/workspace/models/vae/sdxl_vae.safetensors"
+    },
+    "anything_v5": {
+      "path": "/workspace/models/checkpoints/anything_v5.safetensors",
+      "type": "checkpoint",
+      "architecture": "sd15",
+      "vae": "/workspace/models/vae/anime_vae.pt"
+    },
+    "chilloutmix": {
+      "path": "/workspace/models/checkpoints/chilloutmix_NiPrunedFp32Fix.safetensors",
+      "type": "checkpoint",
+      "architecture": "sd15",
+      "vae": "built-in"
+    },
+    "anime_nsfw": {
+      "path": "/workspace/models/checkpoints/anime_nsfw.safetensors",
+      "type": "checkpoint",
+      "architecture": "sd15",
+      "vae": "/workspace/models/vae/anime_vae.pt"
+    }
+  },
+  "loras": {
+    "realistic_vision": {
+      "path": "/workspace/models/lora/realistic_vision_v5.safetensors",
+      "default_strength": 0.7,
+      "compatible_with": ["sdxl"]
+    },
+    "glossy_lux": {
+      "path": "/workspace/models/lora/glossy_magazine_style.safetensors",
+      "default_strength": 0.6,
+      "compatible_with": ["sdxl"]
+    },
+    "anime_style": {
+      "path": "/workspace/models/lora/anime_style_v3.safetensors",
+      "default_strength": 0.8,
+      "compatible_with": ["sd15"]
+    }
+  },
+  "controlnet": {
+    "openpose": {
+      "path": "/workspace/models/controlnet/control_openpose_sd15.pth",
+      "preprocessor": "openpose"
+    },
+    "depth": {
+      "path": "/workspace/models/controlnet/control_depth_sd15.pth",
+      "preprocessor": "midas"
+    },
+    "canny": {
+      "path": "/workspace/models/controlnet/control_canny_sd15.pth",
+      "preprocessor": "canny"
+    }
+  },
+  "notes": {
+    "usage": "This configuration maps logical model names to actual file paths on the POD.",
+    "important": "All paths are absolute and point to /workspace for persistence across POD restarts.",
+    "mvp": "Only models listed here are supported in MVP. Additional models require configuration updates."
+  }
+}

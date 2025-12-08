@@ -1,0 +1,12 @@
+# Telegram Bot
+python-telegram-bot==20.7
+
+# HTTP Client
+httpx==0.26.0
+
+# Image Processing
+Pillow==10.2.0
+
+# Configuration
+pydantic==2.5.3
+pydantic-settings==2.1.0

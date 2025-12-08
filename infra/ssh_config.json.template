@@ -1,0 +1,32 @@
+{
+  "connections": {
+    "proxy": {
+      "host": "ssh.runpod.io",
+      "user": "p8q2agahufxw4a-64410d8e",
+      "port": 22,
+      "key_path": "~/.ssh/id_ed25519",
+      "description": "SSH via RunPod proxy (stable, recommended for automation)"
+    },
+    "direct": {
+      "host": "38.147.83.26",
+      "user": "root",
+      "port": 35108,
+      "key_path": "~/.ssh/id_ed25519",
+      "description": "Direct TCP connection (faster, IP may change on POD restart)"
+    }
+  },
+  "default_connection": "proxy",
+  "workspace_path": "/workspace",
+  "services": {
+    "backend": {
+      "path": "/workspace/backend",
+      "start_command": "uvicorn main:app --host 0.0.0.0 --port 8000",
+      "log_path": "/workspace/logs/backend.log"
+    },
+    "gpu_server": {
+      "path": "/workspace/gpu_server",
+      "start_command": "python server.py",
+      "log_path": "/workspace/logs/gpu_server.log"
+    }
+  }
+}
