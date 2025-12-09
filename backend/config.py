@@ -10,54 +10,54 @@ STYLE_CONFIG = {
     "noir": {
         "name": "Noir cinematic",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, jpeg artifacts, cartoon, anime, 3d, oversaturated, blurry, watermark, text, signature",
-        "prompt_prefix": "noir style, high contrast black and white, cinematic lighting, film noir aesthetic, dramatic shadows, moody atmosphere, vintage photography, ",
-        "default_quality_profile": "balanced",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, noir style, high contrast black and white, cinematic lighting, film noir aesthetic, dramatic shadows, moody atmosphere, vintage photography, ",
+        "default_quality_profile": "pony_balanced",
         "lora": None,
         "lora_strength": None
     },
     "super_realism": {
         "name": "Ultra realistic",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, jpeg artifacts, cartoon, anime, 3d, painting, drawing, illustration, oversaturated, blurry",
-        "prompt_prefix": "hyperrealistic, ultra detailed, 16k uhd, high quality photography, natural lighting, professional photo, dslr, sharp focus, realistic skin texture, ",
-        "default_quality_profile": "high_quality",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, hyperrealistic, ultra detailed, high quality photography, natural lighting, professional photo, sharp focus, realistic skin texture, ",
+        "default_quality_profile": "pony_high_quality",
         "lora": None,
         "lora_strength": None
     },
     "realism": {
         "name": "Photorealism",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, jpeg artifacts, cartoon, anime, 3d, blurry, watermark, text",
-        "prompt_prefix": "photorealistic, detailed, 8k, professional photography, natural lighting, ",
-        "default_quality_profile": "balanced",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, ",
+        "default_quality_profile": "pony_balanced",
         "lora": None,
         "lora_strength": None
     },
     "lux": {
         "name": "Luxury aesthetic",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, jpeg artifacts, cartoon, anime, cheap, low-end, blurry, watermark",
-        "prompt_prefix": "luxury, elegant, professional photography, high-end aesthetic, sophisticated, glamorous, premium quality, ",
-        "default_quality_profile": "high_quality",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, luxury, elegant, professional photography, high-end aesthetic, sophisticated, glamorous, premium quality, ",
+        "default_quality_profile": "pony_high_quality",
         "lora": None,
         "lora_strength": None
     },
     "anime": {
         "name": "Anime style",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, jpeg artifacts, realistic, photo, 3d, blurry, watermark, text, signature, western cartoon",
-        "prompt_prefix": "anime style, highly detailed anime art, vibrant colors, cel shaded, anime aesthetic, manga style, detailed illustration, ",
-        "default_quality_profile": "balanced",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs, realistic, photo",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, anime style, highly detailed anime art, vibrant colors, cel shaded, anime aesthetic, manga style, detailed illustration, ",
+        "default_quality_profile": "pony_balanced",
         "lora": None,
         "lora_strength": None
     },
     "chatgpt": {
         "name": "General purpose",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "low quality, bad anatomy, blurry, watermark, text",
-        "prompt_prefix": "",  # No enhancement for ChatGPT style
-        "default_quality_profile": "balanced",
+        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
+        "prompt_prefix": "score_9, score_8_up, score_7_up, ",
+        "default_quality_profile": "pony_balanced",
         "lora": None,
         "lora_strength": None
     }

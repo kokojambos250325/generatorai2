@@ -38,6 +38,23 @@ QUALITY_PROFILES = {
         "height": 1344,
         "sampler": "dpmpp_2m",
         "scheduler": "karras"
+    },
+    # Pony Diffusion optimized profiles
+    "pony_balanced": {
+        "steps": 30,
+        "cfg": 5.0,  # Recommended CFG for Pony
+        "width": 832,
+        "height": 1216,
+        "sampler": "dpmpp_sde",  # DPM++ SDE Karras
+        "scheduler": "karras"
+    },
+    "pony_high_quality": {
+        "steps": 40,
+        "cfg": 5.0,
+        "width": 896,
+        "height": 1152,
+        "sampler": "dpmpp_2m",  # DPM++ 2M Karras
+        "scheduler": "karras"
     }
 }
 

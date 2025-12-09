@@ -22,6 +22,7 @@ from telegram.ext import ContextTypes
 
 from config import get_settings
 from handlers import start
+from services.translation_service import translate_prompt
 
 logger = logging.getLogger(__name__)
 settings = get_settings()
@@ -183,7 +184,14 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
     
     # Call backend API
     try:
-        prompt = context.user_data['prompt']
+        # Get original prompt and translate to English
+        prompt_original = context.user_data['prompt']
+        prompt = translate_prompt(prompt_original, lang)
+        
+        # Log translation
+        if lang != 'en':
+            logger.info(f"Translated prompt ({lang}→en): '{prompt_original[:50]}...' → '{prompt[:50]}...'")
+        
         face_images = context.user_data.get('face_images', [])
         add_face = len(face_images) > 0
         
