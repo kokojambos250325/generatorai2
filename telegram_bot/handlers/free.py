@@ -46,7 +46,7 @@ async def start_free_generation(update: Update, context: ContextTypes.DEFAULT_TY
     """
     query = update.callback_query
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Add user to active users
     active_users.add(user_id)
@@ -59,14 +59,14 @@ async def start_free_generation(update: Update, context: ContextTypes.DEFAULT_TY
     # Create guide button
     keyboard = [
         [InlineKeyboardButton(
-            locale.get_text("free_generation.btn_guide", lang),
+            get_locale(context).get_text("free_generation.btn_guide", lang),
             callback_data="show_prompt_guide"
         )]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await query.edit_message_text(
-        locale.get_text("free_generation.start", lang),
+        get_locale(context).get_text("free_generation.start", lang),
         reply_markup=reply_markup,
         parse_mode="Markdown"
     )
@@ -80,25 +80,25 @@ async def show_prompt_guide(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer()
     
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Build guide message with examples
     guide_text = (
-        f"📝 **{locale.get_text('free_generation.guide_title', lang)}**\n\n"
-        f"{locale.get_text('free_generation.guide_body', lang)}\n\n"
-        f"**{locale.get_text('free_generation.examples_title', lang)}**\n\n"
-        f"1️⃣ {locale.get_text('free_generation.example_1', lang)}\n\n"
-        f"2️⃣ {locale.get_text('free_generation.example_2', lang)}\n\n"
-        f"3️⃣ {locale.get_text('free_generation.example_3', lang)}\n\n"
-        f"4️⃣ {locale.get_text('free_generation.example_4', lang)}\n\n"
-        f"5️⃣ {locale.get_text('free_generation.example_5', lang)}\n\n"
-        f"💡 {locale.get_text('free_generation.guide_tip', lang)}"
+        f"📝 **{get_locale(context).get_text('free_generation.guide_title', lang)}**\n\n"
+        f"{get_locale(context).get_text('free_generation.guide_body', lang)}\n\n"
+        f"**{get_locale(context).get_text('free_generation.examples_title', lang)}**\n\n"
+        f"1️⃣ {get_locale(context).get_text('free_generation.example_1', lang)}\n\n"
+        f"2️⃣ {get_locale(context).get_text('free_generation.example_2', lang)}\n\n"
+        f"3️⃣ {get_locale(context).get_text('free_generation.example_3', lang)}\n\n"
+        f"4️⃣ {get_locale(context).get_text('free_generation.example_4', lang)}\n\n"
+        f"5️⃣ {get_locale(context).get_text('free_generation.example_5', lang)}\n\n"
+        f"💡 {get_locale(context).get_text('free_generation.guide_tip', lang)}"
     )
     
     # Create back button
     keyboard = [
         [InlineKeyboardButton(
-            locale.get_text("common.back", lang),
+            get_locale(context).get_text("common.back", lang),
             callback_data="mode_free"
         )]
     ]
@@ -116,7 +116,7 @@ async def handle_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Handle text prompt from user.
     """
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Check if user is in free generation flow
     if user_id not in active_users:
@@ -131,7 +131,7 @@ async def handle_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if not prompt or len(prompt) < 3:
         await update.message.reply_text(
-            locale.get_text("errors.prompt_too_short", lang)
+            get_locale(context).get_text("errors.prompt_too_short", lang)
         )
         return
     
@@ -144,18 +144,18 @@ async def handle_prompt(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Ask if user wants to add face
     keyboard = [
         [InlineKeyboardButton(
-            "✅ Yes, add face",
+            get_locale(context).get_text("free_generation.btn_face_yes", lang),
             callback_data="face_yes"
         )],
         [InlineKeyboardButton(
-            "❌ No, just text",
+            get_locale(context).get_text("free_generation.btn_face_no", lang),
             callback_data="face_no"
         )]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await update.message.reply_text(
-        "💡 Do you want to add a face to your generation?\n\nThis will make the generated person have features from your reference photo.",
+        get_locale(context).get_text("free_generation.add_face_question", lang),
         reply_markup=reply_markup
     )
 
@@ -168,7 +168,7 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
     await query.answer()
     
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Store style
     context.user_data['style'] = style
@@ -177,7 +177,7 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
     
     # Show generating message
     await query.edit_message_text(
-        locale.get_text("free_generation.generating", lang, style=style),
+        get_locale(context).get_text("free_generation.generating", lang, style=style),
         parse_mode="Markdown"
     )
     
@@ -220,7 +220,7 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
                 
                 image_data = base64.b64decode(result['image'])
                 
-                caption = locale.get_text(
+                caption = get_locale(context).get_text(
                     "free_generation.success",
                     lang,
                     style=style,
@@ -242,19 +242,19 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
                 # Error
                 error_msg = result.get('error', 'Unknown error')
                 await query.message.reply_text(
-                    locale.get_text("errors.generation_failed", lang, error=error_msg)
+                    get_locale(context).get_text("errors.generation_failed", lang, error=error_msg)
                 )
                 logger.error(f"Generation failed for user {user_id}: {error_msg}")
     
     except httpx.TimeoutException:
         await query.message.reply_text(
-            locale.get_text("errors.timeout", lang)
+            get_locale(context).get_text("errors.timeout", lang)
         )
         logger.error(f"Timeout for user {user_id}")
     
     except Exception as e:
         await query.message.reply_text(
-            locale.get_text("errors.generic", lang, error=str(e))
+            get_locale(context).get_text("errors.generic", lang, error=str(e))
         )
         logger.error(f"Error for user {user_id}: {e}", exc_info=True)
     
@@ -275,7 +275,7 @@ async def handle_face_choice(update: Update, context: ContextTypes.DEFAULT_TYPE)
     await query.answer()
     
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     choice = query.data
     
     if choice == "face_yes":
@@ -283,9 +283,12 @@ async def handle_face_choice(update: Update, context: ContextTypes.DEFAULT_TYPE)
         context.user_data['step'] = 'waiting_face_photos'
         
         await query.edit_message_text(
-            "📷 Please send 1-5 face reference photos.\n\n✅ Clear, frontal face photos work best\n👍 High quality recommended\n\n Send photos then type 'done' or click the button below.",
+            get_locale(context).get_text("free_generation.face_upload_request", lang),
             reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("✅ Done, continue", callback_data="face_done")]
+                [InlineKeyboardButton(
+                    get_locale(context).get_text("free_generation.btn_face_done", lang),
+                    callback_data="face_done"
+                )]
             ])
         )
     
@@ -293,7 +296,7 @@ async def handle_face_choice(update: Update, context: ContextTypes.DEFAULT_TYPE)
         # User doesn't want face - proceed to style selection
         context.user_data['step'] = 'waiting_style'
         
-        await show_style_menu(query, lang)
+        await show_style_menu(query, context, lang)
 
 
 async def handle_face_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -301,7 +304,7 @@ async def handle_face_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Handle face photo upload.
     """
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Check if user is in face photo upload step
     if context.user_data.get('step') != 'waiting_face_photos':
@@ -324,7 +327,7 @@ async def handle_face_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         if len(face_images) >= 5:
             await update.message.reply_text(
-                "⚠️ Maximum 5 face photos reached. Type 'done' to continue."
+                get_locale(context).get_text("free_generation.face_photos_max", lang)
             )
             return
         
@@ -332,14 +335,18 @@ async def handle_face_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data['face_images'] = face_images
         
         await update.message.reply_text(
-            f"✅ Face photo {len(face_images)}/5 received.\n\nSend more photos or type 'done' to continue."
+            get_locale(context).get_text(
+                "free_generation.face_photo_received",
+                lang,
+                count=len(face_images)
+            )
         )
         
         logger.info(f"User {user_id} uploaded face photo {len(face_images)}/5")
     
     except Exception as e:
         await update.message.reply_text(
-            locale.get_text("errors.photo_processing", lang, error=str(e))
+            get_locale(context).get_text("errors.photo_processing", lang, error=str(e))
         )
         logger.error(f"Failed to process face photo for user {user_id}: {e}")
 
@@ -350,7 +357,7 @@ async def handle_face_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     query = update.callback_query if update.callback_query else None
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     face_images = context.user_data.get('face_images', [])
     
@@ -366,7 +373,7 @@ async def handle_face_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     if query:
         await query.answer()
-        await show_style_menu(query, lang)
+        await show_style_menu(query, context, lang)
     else:
         # Text command 'done'
         await update.message.reply_text(
@@ -375,7 +382,7 @@ async def handle_face_done(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
 
-async def show_style_menu(query, lang):
+async def show_style_menu(query, context, lang):
     """
     Show style selection menu.
     """
@@ -389,7 +396,7 @@ async def show_style_menu(query, lang):
             callback_data="style_lux"
         )],
         [InlineKeyboardButton(
-            "🏌 Anime",
+            "🎌 Anime",
             callback_data="style_anime"
         )],
         [InlineKeyboardButton(
@@ -408,7 +415,7 @@ async def show_style_menu(query, lang):
     reply_markup = InlineKeyboardMarkup(keyboard)
     
     await query.edit_message_text(
-        locale.get_text("free_generation.choose_style", lang),
+        get_locale(context).get_text("free_generation.choose_style", lang),
         reply_markup=reply_markup
     )
 

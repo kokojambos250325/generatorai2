@@ -15,16 +15,18 @@ logger = logging.getLogger(__name__)
 class GPUClient:
     """HTTP client for GPU service communication"""
     
-    def __init__(self, base_url: str, timeout: int = 180):
+    def __init__(self, base_url: str, timeout: int = 180, request_id: str = None):
         """
         Initialize GPU client.
         
         Args:
             base_url: GPU service base URL
             timeout: Request timeout in seconds
+            request_id: Optional request ID for tracing
         """
         self.base_url = base_url.rstrip('/')
         self.timeout = timeout
+        self.request_id = request_id
     
     async def check_health(self) -> bool:
         """
@@ -61,7 +63,8 @@ class GPUClient:
                     f"{self.base_url}/generate",
                     json={
                         "workflow": workflow,
-                        "params": params
+                        "params": params,
+                        "request_id": self.request_id  # Include request_id for tracing
                     }
                 )
                 
@@ -69,14 +72,14 @@ class GPUClient:
                 return response.json()
         
         except httpx.TimeoutException:
-            logger.error(f"GPU service timeout after {self.timeout}s")
+            logger.error(f"GPU service timeout after {self.timeout}s (request_id={self.request_id})")
             raise Exception(f"Generation timeout after {self.timeout} seconds")
         
         except httpx.HTTPStatusError as e:
-            logger.error(f"GPU service HTTP error: {e.response.status_code}")
+            logger.error(f"GPU service HTTP error: {e.response.status_code} (request_id={self.request_id})")
             error_detail = e.response.json().get("detail", str(e)) if e.response.content else str(e)
             raise Exception(f"GPU service error: {error_detail}")
         
         except Exception as e:
-            logger.error(f"GPU service communication error: {e}")
+            logger.error(f"GPU service communication error: {e} (request_id={self.request_id})")
             raise Exception(f"Failed to communicate with GPU service: {str(e)}")

@@ -10,9 +10,12 @@ import json
 import logging
 import base64
 import asyncio
+import time
 from pathlib import Path
 from typing import Dict, Any, Optional
 import uuid
+
+from json_logging import log_event
 
 logger = logging.getLogger(__name__)
 
@@ -49,12 +52,14 @@ class ComfyUIClient:
             logger.warning(f"ComfyUI health check failed: {e}")
             return False
     
-    def load_workflow(self, workflow_name: str) -> Dict[str, Any]:
+    def load_workflow(self, workflow_name: str, generation_id: str = None, request_id: str = None) -> Dict[str, Any]:
         """
         Load workflow JSON from disk.
         
         Args:
             workflow_name: Workflow filename (without .json)
+            generation_id: Optional generation ID for logging
+            request_id: Optional request ID for tracing
         
         Returns:
             dict: Workflow definition
@@ -65,12 +70,35 @@ class ComfyUIClient:
         workflow_file = self.workflows_path / f"{workflow_name}.json"
         
         if not workflow_file.exists():
+            log_event(
+                logger=logger,
+                level="ERROR",
+                event="error_workflow",
+                message=f"Workflow not found: {workflow_file}",
+                generation_id=generation_id,
+                request_id=request_id,
+                workflow=workflow_name,
+                error_type="FileNotFoundError"
+            )
             raise FileNotFoundError(f"Workflow not found: {workflow_file}")
         
         with open(workflow_file, 'r', encoding='utf-8') as f:
             workflow = json.load(f)
         
-        logger.info(f"Loaded workflow: {workflow_name}")
+        # Count nodes in workflow
+        node_count = len(workflow) if isinstance(workflow, dict) else 0
+        
+        log_event(
+            logger=logger,
+            level="INFO",
+            event="workflow_loaded",
+            message=f"Loaded workflow: {workflow_name}",
+            generation_id=generation_id,
+            request_id=request_id,
+            workflow=workflow_name,
+            node_count=node_count
+        )
+        
         return workflow
     
     def inject_parameters(self, workflow: Dict[str, Any], params: Dict[str, Any]) -> Dict[str, Any]:
@@ -93,11 +121,16 @@ class ComfyUIClient:
         # Inject prompt into CLIPTextEncode node (node 6)
         if "prompt" in params and "6" in modified_workflow:
             modified_workflow["6"]["inputs"]["text"] = params["prompt"]
-            logger.info(f"Injected prompt: {params['prompt']}")
+            logger.info(f"Injected prompt: {params['prompt'][:100]}...")
         
         # Inject negative prompt if provided
         if "negative_prompt" in params and "7" in modified_workflow:
             modified_workflow["7"]["inputs"]["text"] = params["negative_prompt"]
+        
+        # Inject checkpoint/model into CheckpointLoader (node 4)
+        if "checkpoint" in params and "4" in modified_workflow:
+            modified_workflow["4"]["inputs"]["ckpt_name"] = params["checkpoint"]
+            logger.info(f"Injected checkpoint: {params['checkpoint']}")
         
         # Inject sampling parameters into KSampler (node 3)
         if "3" in modified_workflow:
@@ -107,6 +140,10 @@ class ComfyUIClient:
                 modified_workflow["3"]["inputs"]["steps"] = params["steps"]
             if "cfg" in params:
                 modified_workflow["3"]["inputs"]["cfg"] = params["cfg"]
+            if "sampler" in params:
+                modified_workflow["3"]["inputs"]["sampler_name"] = params["sampler"]
+            if "scheduler" in params:
+                modified_workflow["3"]["inputs"]["scheduler"] = params["scheduler"]
         
         # Inject image dimensions into EmptyLatentImage (node 5)
         if "5" in modified_workflow:
@@ -117,12 +154,14 @@ class ComfyUIClient:
         
         return modified_workflow
     
-    async def submit_workflow(self, workflow: Dict[str, Any]) -> str:
+    async def submit_workflow(self, workflow: Dict[str, Any], generation_id: str = None, request_id: str = None) -> str:
         """
         Submit workflow to ComfyUI for execution.
         
         Args:
             workflow: Complete workflow with parameters
+            generation_id: Optional generation ID for logging
+            request_id: Optional request ID for tracing
         
         Returns:
             str: Prompt ID for tracking
@@ -150,19 +189,40 @@ class ComfyUIClient:
                 if not prompt_id:
                     raise Exception("No prompt_id returned from ComfyUI")
                 
-                logger.info(f"Workflow submitted: prompt_id={prompt_id}")
+                log_event(
+                    logger=logger,
+                    level="INFO",
+                    event="comfyui_prompt_sent",
+                    message=f"Workflow submitted to ComfyUI: prompt_id={prompt_id}",
+                    generation_id=generation_id,
+                    request_id=request_id,
+                    prompt_id=prompt_id,
+                    endpoint="/prompt"
+                )
+                
                 return prompt_id
         
         except Exception as e:
-            logger.error(f"Failed to submit workflow: {e}")
+            log_event(
+                logger=logger,
+                level="ERROR",
+                event="error_comfyui",
+                message=f"Failed to submit workflow: {e}",
+                generation_id=generation_id,
+                request_id=request_id,
+                error_type=type(e).__name__,
+                endpoint="/prompt"
+            )
             raise Exception(f"Workflow submission failed: {str(e)}")
     
-    async def wait_for_completion(self, prompt_id: str) -> Dict[str, Any]:
+    async def wait_for_completion(self, prompt_id: str, generation_id: str = None, request_id: str = None) -> Dict[str, Any]:
         """
         Poll ComfyUI until workflow completes.
         
         Args:
             prompt_id: Prompt ID to track
+            generation_id: Optional generation ID for logging
+            request_id: Optional request ID for tracing
         
         Returns:
             dict: Execution result
@@ -172,6 +232,7 @@ class ComfyUIClient:
         """
         max_attempts = 60  # 5 minutes with 5-second intervals
         attempt = 0
+        start_time = time.time()
         
         async with httpx.AsyncClient(timeout=10.0) as client:
             while attempt < max_attempts:
@@ -186,13 +247,51 @@ class ComfyUIClient:
                             
                             # Check if completed
                             if result.get("status", {}).get("completed", False):
-                                logger.info(f"Workflow completed: prompt_id={prompt_id}")
+                                duration_ms = int((time.time() - start_time) * 1000)
+                                
+                                log_event(
+                                    logger=logger,
+                                    level="INFO",
+                                    event="comfyui_complete",
+                                    message=f"Workflow completed: prompt_id={prompt_id}",
+                                    generation_id=generation_id,
+                                    request_id=request_id,
+                                    prompt_id=prompt_id,
+                                    duration_ms=duration_ms
+                                )
+                                
                                 return result
                             
                             # Check for errors
                             if "error" in result.get("status", {}):
                                 error_msg = result["status"]["error"]
+                                
+                                log_event(
+                                    logger=logger,
+                                    level="ERROR",
+                                    event="error_comfyui",
+                                    message=f"Workflow failed: {error_msg}",
+                                    generation_id=generation_id,
+                                    request_id=request_id,
+                                    prompt_id=prompt_id,
+                                    error_type="workflow_execution_error"
+                                )
+                                
                                 raise Exception(f"Workflow failed: {error_msg}")
+                    
+                    # Log polling progress every 10 attempts
+                    if attempt > 0 and attempt % 10 == 0:
+                        log_event(
+                            logger=logger,
+                            level="INFO",
+                            event="comfyui_polling",
+                            message=f"Polling ComfyUI: attempt {attempt}/{max_attempts}",
+                            generation_id=generation_id,
+                            request_id=request_id,
+                            prompt_id=prompt_id,
+                            attempt=attempt,
+                            max_attempts=max_attempts
+                        )
                     
                     # Wait before next poll
                     await asyncio.sleep(5.0)
@@ -203,14 +302,29 @@ class ComfyUIClient:
                     await asyncio.sleep(5.0)
                     attempt += 1
         
+        # Timeout error
+        log_event(
+            logger=logger,
+            level="ERROR",
+            event="error_comfyui",
+            message=f"Workflow timeout after {max_attempts * 5} seconds",
+            generation_id=generation_id,
+            request_id=request_id,
+            prompt_id=prompt_id,
+            error_type="timeout",
+            timeout_seconds=max_attempts * 5
+        )
+        
         raise Exception(f"Workflow timeout after {max_attempts * 5} seconds")
     
-    async def get_output_image(self, result: Dict[str, Any]) -> str:
+    async def get_output_image(self, result: Dict[str, Any], generation_id: str = None, request_id: str = None) -> str:
         """
         Extract output image from workflow result and encode to base64.
         
         Args:
             result: Workflow execution result
+            generation_id: Optional generation ID for logging
+            request_id: Optional request ID for tracing
         
         Returns:
             str: Base64 encoded image
@@ -245,26 +359,49 @@ class ComfyUIClient:
                             
                             response.raise_for_status()
                             image_bytes = response.content
+                            file_size_bytes = len(image_bytes)
                             
                             # Encode to base64
                             image_base64 = base64.b64encode(image_bytes).decode('utf-8')
                             
-                            logger.info(f"Retrieved output image: {filename}")
+                            log_event(
+                                logger=logger,
+                                level="INFO",
+                                event="image_retrieved",
+                                message=f"Retrieved output image: {filename}",
+                                generation_id=generation_id,
+                                request_id=request_id,
+                                filename=filename,
+                                file_size_bytes=file_size_bytes
+                            )
+                            
                             return image_base64
             
             raise Exception("No output images found in result")
         
         except Exception as e:
-            logger.error(f"Failed to get output image: {e}")
+            log_event(
+                logger=logger,
+                level="ERROR",
+                event="error_comfyui",
+                message=f"Failed to get output image: {e}",
+                generation_id=generation_id,
+                request_id=request_id,
+                error_type=type(e).__name__,
+                endpoint="/view"
+            )
             raise Exception(f"Image retrieval failed: {str(e)}")
     
-    async def execute_workflow(self, workflow_name: str, params: Dict[str, Any]) -> str:
+    async def execute_workflow(self, workflow_name: str, params: Dict[str, Any], 
+                              generation_id: str = None, request_id: str = None) -> str:
         """
         Complete workflow execution pipeline.
         
         Args:
             workflow_name: Name of workflow to execute
             params: Generation parameters
+            generation_id: Optional generation ID for logging
+            request_id: Optional request ID for tracing
         
         Returns:
             str: Base64 encoded result image
@@ -272,22 +409,22 @@ class ComfyUIClient:
         Raises:
             Exception: If any step fails
         """
-        logger.info(f"Executing workflow: {workflow_name}")
+        logger.info(f"Executing workflow: {workflow_name} (gen_id={generation_id}, req_id={request_id})")
         
         # Load workflow
-        workflow = self.load_workflow(workflow_name)
+        workflow = self.load_workflow(workflow_name, generation_id=generation_id, request_id=request_id)
         
         # Inject parameters
         workflow = self.inject_parameters(workflow, params)
         
         # Submit to ComfyUI
-        prompt_id = await self.submit_workflow(workflow)
+        prompt_id = await self.submit_workflow(workflow, generation_id=generation_id, request_id=request_id)
         
         # Wait for completion
-        result = await self.wait_for_completion(prompt_id)
+        result = await self.wait_for_completion(prompt_id, generation_id=generation_id, request_id=request_id)
         
         # Get output image
-        image_base64 = await self.get_output_image(result)
+        image_base64 = await self.get_output_image(result, generation_id=generation_id, request_id=request_id)
         
         logger.info(f"Workflow execution complete: {workflow_name}")
         return image_base64

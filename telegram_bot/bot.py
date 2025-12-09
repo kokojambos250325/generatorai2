@@ -74,12 +74,18 @@ def main():
     
     # Register handlers
     application.add_handler(CommandHandler("start", start.start_command))
-    application.add_handler(CallbackQueryHandler(start.button_handler))
     
-    # Free generation handlers
+    # Free generation handlers - TEXT messages for prompts
+    # Don't use filters.User() because active_users changes dynamically
     application.add_handler(MessageHandler(
-        filters.TEXT & ~filters.COMMAND & filters.User(user_id=free.get_active_users()),
+        filters.TEXT & ~filters.COMMAND,
         free.handle_prompt
+    ))
+    
+    # Add callback handler for face choice (yes/no) - BEFORE general button_handler
+    application.add_handler(CallbackQueryHandler(
+        free.handle_face_choice,
+        pattern=r"^face_(yes|no|done)$"
     ))
     
     # Add callback handler for style selection in free mode
@@ -99,9 +105,10 @@ def main():
         pattern=r"^show_prompt_guide$"
     ))
     
-    # Clothes removal handlers
+    # Clothes removal handlers - PHOTO messages
+    # Don't use filters.User() because active_users changes dynamically
     application.add_handler(MessageHandler(
-        filters.PHOTO & filters.User(user_id=clothes.get_active_users()),
+        filters.PHOTO,
         clothes.handle_photo
     ))
     
@@ -115,6 +122,9 @@ def main():
         clothes_style_callback,
         pattern=r"^clothes_style_(realism|lux|anime)$"
     ))
+    
+    # General button handler for main menu - MUST BE LAST
+    application.add_handler(CallbackQueryHandler(start.button_handler))
     
     # Error handler
     application.add_error_handler(error_handler)
