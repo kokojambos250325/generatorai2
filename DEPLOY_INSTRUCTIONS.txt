@@ -1,0 +1,186 @@
+==========================================================
+  ИНСТРУКЦИЯ ПО РАЗВЁРТЫВАНИЮ НА RUNPOD
+==========================================================
+
+Проблема: SSH через Windows PowerShell не работает из-за PTY.
+
+Решение: Используем RunPod Web Terminal (работает в браузере)
+
+==========================================================
+ШАГ 1: Откройте RunPod Web Terminal
+==========================================================
+
+1. Перейдите на https://www.runpod.io/console/pods
+2. Найдите свой pod (p8q2agahufxw4a-64410d8e)
+3. Нажмите кнопку "Connect" → "Start Web Terminal"
+4. Откроется терминал прямо в браузере
+
+==========================================================
+ШАГ 2: Скопируйте и запустите скрипт установки моделей
+==========================================================
+
+В Web Terminal скопируйте весь этот блок и нажмите Enter:
+
+```bash
+curl -o /tmp/setup.sh https://raw.githubusercontent.com/YOUR_REPO/RUNPOD_QUICK_SETUP.sh
+bash /tmp/setup.sh
+```
+
+ИЛИ создайте файл вручную:
+
+```bash
+cat > /tmp/setup.sh <<'SCRIPT'
+#!/bin/bash
+set -e
+mkdir -p /workspace/models/diffusers /tmp/gpu_results /app
+export HF_HOME=/workspace/models DIFFUSERS_CACHE=/workspace/models/diffusers
+pip install -q torch torchvision --index-url https://download.pytorch.org/whl/cu118
+pip install -q diffusers transformers accelerate safetensors fastapi uvicorn httpx pydantic insightface onnxruntime-gpu opencv-python pillow
+
+python3 <<'PY'
+from diffusers import StableDiffusionXLPipeline, ControlNetModel
+import torch
+from insightface.app import FaceAnalysis
+
+print("Загрузка SDXL Base...")
+pipe = StableDiffusionXLPipeline.from_pretrained(
+    "stabilityai/stable-diffusion-xl-base-1.0",
+    torch_dtype=torch.float16,
+    cache_dir="/workspace/models/diffusers"
+)
+print("✓ SDXL Base")
+
+print("Загрузка ControlNet...")
+cn = ControlNetModel.from_pretrained(
+    "diffusers/controlnet-canny-sdxl-1.0",
+    torch_dtype=torch.float16,
+    cache_dir="/workspace/models/diffusers"
+)
+print("✓ ControlNet")
+
+print("Установка InsightFace...")
+app = FaceAnalysis(name='buffalo_l')
+app.prepare(ctx_id=0, det_size=(640, 640))
+print("✓ InsightFace")
+print("\n✅ Все модели установлены!")
+PY
+SCRIPT
+
+bash /tmp/setup.sh
+```
+
+Это займёт 10-15 минут (загрузка ~15GB моделей).
+
+==========================================================
+ШАГ 3: Загрузите файлы проекта
+==========================================================
+
+Вариант А - через Git (рекомендуется):
+```bash
+cd /workspace
+git clone https://github.com/YOUR_USERNAME/generator.git app
+cd /workspace/app
+```
+
+Вариант Б - через RunPod Web Terminal Upload:
+1. В Web Terminal нажмите кнопку "Upload" (справа вверху)
+2. Загрузите папку `gpu_server` целиком
+3. Переместите в /app:
+```bash
+mv ~/gpu_server /app/
+```
+
+==========================================================
+ШАГ 4: Запустите GPU сервер
+==========================================================
+
+```bash
+cd /app
+export MODEL_CACHE_DIR=/workspace/models
+export DIFFUSERS_CACHE=/workspace/models/diffusers
+export HF_HOME=/workspace/models
+export RESULT_STORAGE_DIR=/tmp/gpu_results
+export GPU_SERVER_PORT=3000
+
+python -m uvicorn gpu_server.server.main:app --host 0.0.0.0 --port 3000
+```
+
+Сервер запустится на порту 3000.
+
+==========================================================
+ШАГ 5: Проверьте работу
+==========================================================
+
+В другой вкладке Web Terminal или через curl:
+
+```bash
+curl http://localhost:3000/health
+```
+
+Ожидаемый ответ:
+```json
+{
+  "status": "ok",
+  "gpu_available": true,
+  "models": {
+    "sdxl_base": true,
+    "controlnet_canny": true
+  }
+}
+```
+
+==========================================================
+ШАГ 6: Получите публичный URL
+==========================================================
+
+В RunPod Console:
+1. Найдите ваш pod
+2. В разделе "TCP Port Mappings" добавьте порт 3000
+3. Скопируйте публичный URL (например: https://abc123-3000.proxy.runpod.net)
+
+==========================================================
+ШАГ 7: Настройте локальный бэкенд
+==========================================================
+
+На вашем Windows компьютере, в файле `.env`:
+
+```env
+GPU_SERVER_URL=https://abc123-3000.proxy.runpod.net
+GPU_SERVER_API_KEY=   # оставьте пустым если не настроен
+```
+
+Запустите бэкенд:
+```powershell
+python -m uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+==========================================================
+ШАГ 8: Тестирование
+==========================================================
+
+PowerShell:
+```powershell
+$body = @{
+  mode = "free"
+  prompt = "a beautiful sunset over mountains"
+  seed = 42
+} | ConvertTo-Json
+
+Invoke-RestMethod -Method Post -Uri http://localhost:8000/generate -ContentType "application/json" -Body $body
+```
+
+Получите task_id, затем:
+```powershell
+Invoke-RestMethod -Method Get -Uri http://localhost:8000/generate/result/<TASK_ID>
+```
+
+==========================================================
+ГОТОВО!
+==========================================================
+
+Теперь у вас:
+✅ GPU сервер на RunPod с загруженными моделями
+✅ Локальный бэкенд подключён к GPU серверу
+✅ Можно отправлять запросы на генерацию
+
+Если возникли проблемы - проверьте логи в Web Terminal.

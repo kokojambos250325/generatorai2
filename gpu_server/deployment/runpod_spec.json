@@ -1,0 +1,38 @@
+{
+  "name": "AI Generator GPU Server",
+  "dockerArgs": "bash -c 'cd /workspace && git pull && bash /workspace/gpu_server/deployment/start.sh'",
+  "ports": "3000/http,8188/http",
+  "volumeInGb": 50,
+  "containerDiskInGb": 20,
+  "minVcpuCount": 4,
+  "minMemoryInGb": 16,
+  "gpuType": "NVIDIA RTX 3090",
+  "gpuCount": 1,
+  "env": [
+    {
+      "key": "MODEL_CACHE_DIR",
+      "value": "/workspace/models"
+    },
+    {
+      "key": "HF_HOME",
+      "value": "/workspace/models"
+    },
+    {
+      "key": "DIFFUSERS_CACHE",
+      "value": "/workspace/models/diffusers"
+    },
+    {
+      "key": "GPU_SERVER_PORT",
+      "value": "3000"
+    },
+    {
+      "key": "LOG_LEVEL",
+      "value": "INFO"
+    },
+    {
+      "key": "RESULT_STORAGE_DIR",
+      "value": "/tmp/gpu_results"
+    }
+  ],
+  "startScript": "/workspace/gpu_server/deployment/start.sh"
+}

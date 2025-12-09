@@ -42,7 +42,7 @@ async def start_clothes_removal(update: Update, context: ContextTypes.DEFAULT_TY
     """
     query = update.callback_query
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Add user to active users
     active_users.add(user_id)
@@ -52,7 +52,7 @@ async def start_clothes_removal(update: Update, context: ContextTypes.DEFAULT_TY
     context.user_data['step'] = 'waiting_photo'
     
     await query.edit_message_text(
-        locale.get_text("clothes_removal.start", lang),
+        get_locale(context).get_text("clothes_removal.start", lang),
         parse_mode="Markdown"
     )
 
@@ -62,7 +62,7 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Handle photo from user.
     """
     user_id = update.effective_user.id
-    lang = locale.get_user_language(user_id)
+    lang = get_locale(context).get_user_language(user_id)
     
     # Check if user is in clothes removal flow
     if user_id not in active_users:
@@ -92,28 +92,28 @@ async def handle_photo(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Ask for style
         keyboard = [
             [InlineKeyboardButton(
-                locale.get_text("clothes_removal.style_realism", lang),
+                get_locale(context).get_text("clothes_removal.style_realism", lang),
                 callback_data="clothes_style_realism"
             )],
             [InlineKeyboardButton(
-                locale.get_text("clothes_removal.style_lux", lang),
+                get_locale(context).get_text("clothes_removal.style_lux", lang),
                 callback_data="clothes_style_lux"
             )],
             [InlineKeyboardButton(
-                locale.get_text("clothes_removal.style_anime", lang),
+                get_locale(context).get_text("clothes_removal.style_anime", lang),
                 callback_data="clothes_style_anime"
             )]
         ]
         reply_markup = InlineKeyboardMarkup(keyboard)
         
         await update.message.reply_text(
-            locale.get_text("clothes_removal.choose_style", lang),
+            get_locale(context).get_text("clothes_removal.choose_style", lang),
             reply_markup=reply_markup
         )
     
     except Exception as e:
         await update.message.reply_text(
-            locale.get_text("errors.photo_processing", lang, error=str(e))
+            get_locale(context).get_text("errors.photo_processing", lang, error=str(e))
         )
         logger.error(f"Photo processing error for user {user_id}: {e}", exc_info=True)
 
@@ -131,7 +131,7 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
     
     # Show processing message
     await query.edit_message_text(
-        locale.get_text("clothes_removal.processing", lang, style=style),
+        get_locale(context).get_text("clothes_removal.processing", lang, style=style),
         parse_mode="Markdown"
     )
     
@@ -161,7 +161,7 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
                 
                 await query.message.reply_photo(
                     photo=io.BytesIO(image_data),
-                    caption=locale.get_text("clothes_removal.success", lang, style=style),
+                    caption=get_locale(context).get_text("clothes_removal.success", lang, style=style),
                     parse_mode="Markdown"
                 )
                 
@@ -171,19 +171,19 @@ async def handle_style_selection(update: Update, context: ContextTypes.DEFAULT_T
                 # Error
                 error_msg = result.get('error', 'Unknown error')
                 await query.message.reply_text(
-                    locale.get_text("errors.processing_failed", lang, error=error_msg)
+                    get_locale(context).get_text("errors.processing_failed", lang, error=error_msg)
                 )
                 logger.error(f"Processing failed for user {user_id}: {error_msg}")
     
     except httpx.TimeoutException:
         await query.message.reply_text(
-            locale.get_text("errors.timeout_clothes", lang)
+            get_locale(context).get_text("errors.timeout_clothes", lang)
         )
         logger.error(f"Timeout for user {user_id}")
     
     except Exception as e:
         await query.message.reply_text(
-            locale.get_text("errors.generic", lang, error=str(e))
+            get_locale(context).get_text("errors.generic", lang, error=str(e))
         )
         logger.error(f"Error for user {user_id}: {e}", exc_info=True)
     

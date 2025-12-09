@@ -1,0 +1,69 @@
+{
+  "language_selection": {
+    "title": "🌐 Por favor, selecciona tu idioma:",
+    "selected": "✅ Idioma establecido en Español"
+  },
+  "main_menu": {
+    "welcome": "👋 ¡Bienvenido, {name}!\n\n🎨 **Bot de Generación de Imágenes con IA**\n\nPuedo ayudarte a crear imágenes increíbles con IA. Elige un modo:",
+    "btn_free": "🎨 Generación Libre",
+    "btn_clothes": "👕 Quitar Ropa",
+    "btn_nsfw_face": "🔥 NSFW con Rostro",
+    "btn_face_swap": "🔄 Cambio de Rostro",
+    "btn_language": "🌐 Cambiar Idioma",
+    "btn_channel": "📢 Canal",
+    "btn_support": "❓ Soporte",
+    "choose_mode": "Elige un modo:"
+  },
+  "free_generation": {
+    "start": "🎨 **Generación Libre**\n\nEnvíame una descripción de texto de la imagen que quieres generar.\n\nEjemplo: *un hermoso paisaje de montaña al atardecer, fotorrealista*\n\nO usa /start para volver al menú principal.",
+    "start_with_help": "🎨 **Generación Libre**\n\nEnvía tu prompt de texto, o:",
+    "btn_guide": "💡 Guía",
+    "btn_examples": "📋 Ejemplos",
+    "prompt_request": "Tu prompt:",
+    "prompt_received": "¡Genial! Ahora elige un estilo:",
+    "prompt_too_short": "❌ El prompt es demasiado corto. Por favor proporciona una descripción más detallada (al menos 3 caracteres).",
+    "style_selection": "Elige un estilo:",
+    "style_realism": "📸 Realismo",
+    "style_lux": "✨ Lujo",
+    "style_anime": "🎌 Anime",
+    "style_chatgpt": "🤖 ChatGPT",
+    "style_noir": "🕶 Noir",
+    "style_super_realism": "📸 Súper Realismo",
+    "generating": "🎨 Generando imagen con estilo **{style}**...\n\nEsto puede tardar 30-60 segundos. Por favor espera.",
+    "success": "✅ ¡Generado con estilo **{style}**!\n\nPrompt: _{prompt}_",
+    "guide_title": "💡 **Cómo Escribir Prompts Efectivos**",
+    "guide_body": "Un buen prompt incluye:\n\n1. **Sujeto** - Quién o qué\n2. **Acción/Pose** - Qué están haciendo\n3. **Ubicación** - Dónde\n4. **Atmósfera** - Estado de ánimo y estilo\n5. **Detalles** - Ropa, iluminación, ángulo de cámara\n\n✨ ¡Sé específico para mejores resultados!",
+    "examples_title": "📋 **Prompts de Ejemplo**",
+    "example_1": "Retrato de mujer elegante al estilo de los años 40, sombras dramáticas, blanco y negro, estética de cine negro",
+    "example_2": "Escena callejera cyberpunk de noche, letreros de neón reflejándose en la lluvia, paisaje urbano futurista",
+    "example_3": "Chica anime con pelo azul largo, uniforme escolar, pétalos de cerezo cayendo, estilo anime detallado",
+    "btn_use_example": "Usar Ejemplo #{num}",
+    "example_selected": "📋 ¡Ejemplo seleccionado! Ahora elige un estilo:"
+  },
+  "clothes_removal": {
+    "start": "👕 **Quitar Ropa**\n\nEnvíame una foto de una persona vestida.\n\n⚠️ **Importante:**\n- La foto debe mostrar cuerpo completo o parte superior\n- Imagen clara y bien iluminada\n- Una persona por foto",
+    "photo_received": "✅ ¡Foto recibida! Analizando...",
+    "style_selection": "Elige el estilo de salida:",
+    "processing": "👕 Procesando imagen con estilo **{style}**...\n\n⚙️ Analizando pose y estructura...\n⏳ Esto puede tardar 60-120 segundos.",
+    "success": "✅ ¡Procesamiento completado!"
+  },
+  "errors": {
+    "generic": "❌ Ocurrió un error. Por favor inténtalo de nuevo o usa /start para volver al menú principal.",
+    "timeout": "⏱ Tiempo de espera agotado. La generación tardó demasiado.\n\nPor favor inténtalo con un prompt más simple.",
+    "backend_unavailable": "❌ Servicio temporalmente no disponible. Por favor inténtalo de nuevo en unos momentos.",
+    "invalid_photo": "❌ Foto inválida. Por favor envía una imagen JPG o PNG.",
+    "photo_too_large": "❌ Foto demasiado grande. Máximo {max_mb}MB permitido.",
+    "photo_too_small": "❌ Resolución de foto muy baja. Se requiere mínimo 512x512 píxeles."
+  },
+  "buttons": {
+    "back_to_menu": "🔙 Volver al Menú",
+    "cancel": "❌ Cancelar",
+    "done": "✅ Listo",
+    "retry": "🔄 Reintentar"
+  },
+  "common": {
+    "please_wait": "⏳ Por favor espera...",
+    "processing": "⚙️ Procesando...",
+    "loading": "🔄 Cargando..."
+  }
+}

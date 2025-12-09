@@ -1,0 +1,12 @@
+[Bookmarks]
+SubRep=RunPod
+ImgNum=41
+
+[Bookmarks_1]
+SessionName=RunPod Server
+SessionType=0
+HostName=ssh.runpod.io
+UserName=root
+PortNumber=22063
+RemoteDir=/workspace/ai-generator
+LocalDir=c:\восставшие\generator

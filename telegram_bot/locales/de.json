@@ -1,0 +1,71 @@
+{
+  "language_selection": {
+    "title": "🌐 Bitte wählen Sie Ihre Sprache:",
+    "selected": "✅ Sprache auf Deutsch eingestellt"
+  },
+  "main_menu": {
+    "welcome": "👋 Willkommen, {name}!\n\n🎨 **KI-Bildgenerierungs-Bot**\n\nIch kann Ihnen helfen, erstaunliche Bilder mit KI zu erstellen. Wählen Sie einen Modus:",
+    "btn_free": "🎨 Freie Generierung",
+    "btn_clothes": "👕 Kleidung entfernen",
+    "btn_nsfw_face": "🔥 NSFW mit Gesicht",
+    "btn_face_swap": "🔄 Gesichtstausch",
+    "btn_language": "🌐 Sprache ändern",
+    "btn_channel": "📢 Kanal",
+    "btn_support": "❓ Support",
+    "choose_mode": "Wählen Sie einen Modus:"
+  },
+  "free_generation": {
+    "start": "🎨 **Freie Generierung**\n\nSenden Sie mir eine Textbeschreibung des Bildes, das Sie generieren möchten.\n\nBeispiel: *eine schöne Berglandschaft bei Sonnenuntergang, fotorealistisch*\n\nOder verwenden Sie /start, um zum Hauptmenü zurückzukehren.",
+    "start_with_help": "🎨 **Freie Generierung**\n\nSenden Sie Ihren Text-Prompt oder:",
+    "btn_guide": "💡 Anleitung",
+    "btn_examples": "📋 Beispiele",
+    "prompt_request": "Ihr Prompt:",
+    "prompt_received": "Großartig! Wählen Sie jetzt einen Stil:",
+    "prompt_too_short": "❌ Prompt ist zu kurz. Bitte geben Sie eine detailliertere Beschreibung an (mindestens 3 Zeichen).",
+    "style_selection": "Wählen Sie einen Stil:",
+    "style_realism": "📸 Realismus",
+    "style_lux": "✨ Luxus",
+    "style_anime": "🎌 Anime",
+    "style_chatgpt": "🤖 ChatGPT",
+    "style_noir": "🕶 Noir",
+    "style_super_realism": "📸 Super-Realismus",
+    "generating": "🎨 Generiere Bild im **{style}**-Stil...\n\nDies kann 30-60 Sekunden dauern. Bitte warten.",
+    "success": "✅ Generiert im **{style}**-Stil!\n\nPrompt: _{prompt}_",
+    "guide_title": "💡 **Wie man effektive Prompts schreibt**",
+    "guide_body": "Ein guter Prompt enthält:\n\n1. **Subjekt** - Wer oder was\n2. **Aktion/Pose** - Was sie tun\n3. **Ort** - Wo (Strand, Stadt, Raum, Wald)\n4. **Atmosphäre** - Stimmung und Stil\n5. **Details** - Kleidung, Beleuchtung, Kamerawinkel\n\n**Beispiel:**\n_\"Junge Frau auf Dach bei Nacht, langes fließendes Haar, Neon-Stadt im Hintergrund, kinematografische Beleuchtung, Noir-Atmosphäre\"_\n\n✨ Seien Sie spezifisch für beste Ergebnisse!",
+    "examples_title": "📋 **Beispiel-Prompts**\n\nWählen Sie ein Beispiel:",
+    "example_1": "Porträt einer eleganten Frau im Stil der 1940er Jahre, dramatische Schatten, schwarz-weiß, Film-Noir-Ästhetik",
+    "example_2": "Cyberpunk-Straßenszene bei Nacht, Neonlichter spiegeln sich im Regen, futuristische Stadtlandschaft",
+    "example_3": "Anime-Mädchen mit langen blauen Haaren, Schuluniform, fallende Kirschblüten, detaillierter Anime-Stil",
+    "example_4": "Professionelle Porträtfotografie, natürliches Tageslicht, geringe Schärfentiefe, 35mm Objektiv",
+    "example_5": "Ätherisches Fantasy-Porträt, magischer Wald im Hintergrund, weiches Licht, mystische Atmosphäre",
+    "btn_use_example": "Beispiel #{num} verwenden",
+    "example_selected": "📋 Beispiel ausgewählt! Wählen Sie einen Stil:"
+  },
+  "clothes_removal": {
+    "start": "👕 **Kleidung entfernen**\n\nSenden Sie mir ein Foto einer bekleideten Person.\n\n⚠️ **Wichtig:**\n- Ganzkörper oder Oberkörper sichtbar\n- Klares, gut beleuchtetes Bild\n- Eine Person pro Foto",
+    "photo_received": "✅ Foto erhalten! Analysiere...",
+    "style_selection": "Wählen Sie den Ausgabestil:",
+    "processing": "👕 Verarbeite Bild im **{style}**-Stil...\n\n⚙️ Analysiere Pose und Struktur...\n⏳ Dies kann 60-120 Sekunden dauern.",
+    "success": "✅ Verarbeitung abgeschlossen!"
+  },
+  "errors": {
+    "generic": "❌ Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut oder verwenden Sie /start.",
+    "timeout": "⏱ Zeitüberschreitung. Die Generierung dauerte zu lange.\n\nBitte versuchen Sie es mit einem einfacheren Prompt.",
+    "backend_unavailable": "❌ Service vorübergehend nicht verfügbar. Bitte versuchen Sie es in einigen Momenten erneut.",
+    "invalid_photo": "❌ Ungültiges Foto. Bitte senden Sie ein JPG- oder PNG-Bild.",
+    "photo_too_large": "❌ Foto zu groß. Maximal {max_mb}MB erlaubt.",
+    "photo_too_small": "❌ Fotoauflösung zu niedrig. Mindestens 512x512 Pixel erforderlich."
+  },
+  "buttons": {
+    "back_to_menu": "🔙 Zurück zum Menü",
+    "cancel": "❌ Abbrechen",
+    "done": "✅ Fertig",
+    "retry": "🔄 Erneut versuchen"
+  },
+  "common": {
+    "please_wait": "⏳ Bitte warten...",
+    "processing": "⚙️ Verarbeitung...",
+    "loading": "🔄 Laden..."
+  }
+}

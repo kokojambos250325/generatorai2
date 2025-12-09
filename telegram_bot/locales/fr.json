@@ -1,0 +1,69 @@
+{
+  "language_selection": {
+    "title": "🌐 Veuillez sélectionner votre langue:",
+    "selected": "✅ Langue définie sur Français"
+  },
+  "main_menu": {
+    "welcome": "👋 Bienvenue, {name}!\n\n🎨 **Bot de Génération d'Images IA**\n\nJe peux vous aider à créer des images incroyables avec l'IA. Choisissez un mode:",
+    "btn_free": "🎨 Génération Libre",
+    "btn_clothes": "👕 Retirer les Vêtements",
+    "btn_nsfw_face": "🔥 NSFW avec Visage",
+    "btn_face_swap": "🔄 Échange de Visage",
+    "btn_language": "🌐 Changer la Langue",
+    "btn_channel": "📢 Canal",
+    "btn_support": "❓ Support",
+    "choose_mode": "Choisissez un mode:"
+  },
+  "free_generation": {
+    "start": "🎨 **Génération Libre**\n\nEnvoyez-moi une description textuelle de l'image que vous souhaitez générer.\n\nExemple: *un beau paysage de montagne au coucher du soleil, photoréaliste*\n\nOu utilisez /start pour revenir au menu principal.",
+    "start_with_help": "🎨 **Génération Libre**\n\nEnvoyez votre prompt texte, ou:",
+    "btn_guide": "💡 Guide",
+    "btn_examples": "📋 Exemples",
+    "prompt_request": "Votre prompt:",
+    "prompt_received": "Génial! Choisissez maintenant un style:",
+    "prompt_too_short": "❌ Le prompt est trop court. Veuillez fournir une description plus détaillée (au moins 3 caractères).",
+    "style_selection": "Choisissez un style:",
+    "style_realism": "📸 Réalisme",
+    "style_lux": "✨ Luxe",
+    "style_anime": "🎌 Anime",
+    "style_chatgpt": "🤖 ChatGPT",
+    "style_noir": "🕶 Noir",
+    "style_super_realism": "📸 Super Réalisme",
+    "generating": "🎨 Génération d'image avec le style **{style}**...\n\nCela peut prendre 30-60 secondes. Veuillez patienter.",
+    "success": "✅ Généré avec le style **{style}**!\n\nPrompt: _{prompt}_",
+    "guide_title": "💡 **Comment Écrire des Prompts Efficaces**",
+    "guide_body": "Un bon prompt inclut:\n\n1. **Sujet** - Qui ou quoi\n2. **Action/Pose** - Ce qu'ils font\n3. **Lieu** - Où\n4. **Atmosphère** - Humeur et style\n5. **Détails** - Vêtements, éclairage, angle de caméra\n\n✨ Soyez spécifique pour de meilleurs résultats!",
+    "examples_title": "📋 **Exemples de Prompts**",
+    "example_1": "Portrait d'une femme élégante dans le style des années 1940, ombres dramatiques, noir et blanc, esthétique film noir",
+    "example_2": "Scène de rue cyberpunk la nuit, enseignes néon se reflétant dans la pluie, paysage urbain futuriste",
+    "example_3": "Fille anime aux longs cheveux bleus, uniforme scolaire, pétales de cerisier qui tombent, style anime détaillé",
+    "btn_use_example": "Utiliser l'Exemple #{num}",
+    "example_selected": "📋 Exemple sélectionné! Choisissez maintenant un style:"
+  },
+  "clothes_removal": {
+    "start": "👕 **Retirer les Vêtements**\n\nEnvoyez-moi une photo d'une personne habillée.\n\n⚠️ **Important:**\n- La photo doit montrer le corps entier ou le haut du corps\n- Image claire et bien éclairée\n- Une personne par photo",
+    "photo_received": "✅ Photo reçue! Analyse en cours...",
+    "style_selection": "Choisissez le style de sortie:",
+    "processing": "👕 Traitement de l'image avec le style **{style}**...\n\n⚙️ Analyse de la pose et de la structure...\n⏳ Cela peut prendre 60-120 secondes.",
+    "success": "✅ Traitement terminé!"
+  },
+  "errors": {
+    "generic": "❌ Une erreur s'est produite. Veuillez réessayer ou utilisez /start pour revenir au menu principal.",
+    "timeout": "⏱ Délai d'attente dépassé. La génération a pris trop de temps.\n\nVeuillez réessayer avec un prompt plus simple.",
+    "backend_unavailable": "❌ Service temporairement indisponible. Veuillez réessayer dans quelques instants.",
+    "invalid_photo": "❌ Photo invalide. Veuillez envoyer une image JPG ou PNG.",
+    "photo_too_large": "❌ Photo trop grande. Maximum {max_mb}MB autorisé.",
+    "photo_too_small": "❌ Résolution de la photo trop faible. Minimum 512x512 pixels requis."
+  },
+  "buttons": {
+    "back_to_menu": "🔙 Retour au Menu",
+    "cancel": "❌ Annuler",
+    "done": "✅ Terminé",
+    "retry": "🔄 Réessayer"
+  },
+  "common": {
+    "please_wait": "⏳ Veuillez patienter...",
+    "processing": "⚙️ Traitement...",
+    "loading": "🔄 Chargement..."
+  }
+}

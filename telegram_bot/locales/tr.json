@@ -1,0 +1,69 @@
+{
+  "language_selection": {
+    "title": "🌐 Lütfen dilinizi seçin:",
+    "selected": "✅ Dil Türkçe olarak ayarlandı"
+  },
+  "main_menu": {
+    "welcome": "👋 Hoş geldiniz, {name}!\n\n🎨 **AI Görüntü Oluşturma Botu**\n\nYapay zeka ile harika görseller oluşturmanıza yardımcı olabilirim. Bir mod seçin:",
+    "btn_free": "🎨 Serbest Oluşturma",
+    "btn_clothes": "👕 Kıyafet Kaldır",
+    "btn_nsfw_face": "🔥 Yüzlü NSFW",
+    "btn_face_swap": "🔄 Yüz Değiştir",
+    "btn_language": "🌐 Dili Değiştir",
+    "btn_channel": "📢 Kanal",
+    "btn_support": "❓ Destek",
+    "choose_mode": "Bir mod seçin:"
+  },
+  "free_generation": {
+    "start": "🎨 **Serbest Oluşturma**\n\nOluşturmak istediğiniz görüntünün metin açıklamasını gönderin.\n\nÖrnek: *gün batımında güzel bir dağ manzarası, fotorealistik*\n\nVeya ana menüye dönmek için /start kullanın.",
+    "start_with_help": "🎨 **Serbest Oluşturma**\n\nMetin komutunuzu gönderin veya:",
+    "btn_guide": "💡 Kılavuz",
+    "btn_examples": "📋 Örnekler",
+    "prompt_request": "Komutunuz:",
+    "prompt_received": "Harika! Şimdi bir stil seçin:",
+    "prompt_too_short": "❌ Komut çok kısa. Lütfen daha ayrıntılı bir açıklama yapın (en az 3 karakter).",
+    "style_selection": "Bir stil seçin:",
+    "style_realism": "📸 Gerçekçilik",
+    "style_lux": "✨ Lüks",
+    "style_anime": "🎌 Anime",
+    "style_chatgpt": "🤖 ChatGPT",
+    "style_noir": "🕶 Noir",
+    "style_super_realism": "📸 Süper Gerçekçilik",
+    "generating": "🎨 **{style}** stilinde görüntü oluşturuluyor...\n\nBu 30-60 saniye sürebilir. Lütfen bekleyin.",
+    "success": "✅ **{style}** stilinde oluşturuldu!\n\nKomut: _{prompt}_",
+    "guide_title": "💡 **Etkili Komutlar Nasıl Yazılır**",
+    "guide_body": "İyi bir komut şunları içerir:\n\n1. **Konu** - Kim veya ne\n2. **Eylem/Poz** - Ne yapıyorlar\n3. **Konum** - Nerede\n4. **Atmosfer** - Ruh hali ve stil\n5. **Detaylar** - Kıyafet, ışık, kamera açısı\n\n✨ En iyi sonuçlar için spesifik olun!",
+    "examples_title": "📋 **Örnek Komutlar**",
+    "example_1": "1940'lar tarzında zarif kadın portresi, dramatik gölgeler, siyah beyaz, film noir estetiği",
+    "example_2": "Gece siber punk sokak sahnesi, yağmurda yansıyan neon ışıklar, fütüristik şehir manzarası",
+    "example_3": "Uzun mavi saçlı anime kız, okul üniforması, düşen kiraz çiçekleri, detaylı anime stili",
+    "btn_use_example": "Örnek #{num} Kullan",
+    "example_selected": "📋 Örnek seçildi! Şimdi bir stil seçin:"
+  },
+  "clothes_removal": {
+    "start": "👕 **Kıyafet Kaldır**\n\nGiyinmiş bir kişinin fotoğrafını gönderin.\n\n⚠️ **Önemli:**\n- Tam vücut veya üst vücut görünür olmalı\n- Net, iyi aydınlatılmış görüntü\n- Fotoğrafta bir kişi",
+    "photo_received": "✅ Fotoğraf alındı! Analiz ediliyor...",
+    "style_selection": "Çıktı stilini seçin:",
+    "processing": "👕 **{style}** stilinde görüntü işleniyor...\n\n⚙️ Poz ve yapı analiz ediliyor...\n⏳ Bu 60-120 saniye sürebilir.",
+    "success": "✅ İşlem tamamlandı!"
+  },
+  "errors": {
+    "generic": "❌ Bir hata oluştu. Lütfen tekrar deneyin veya ana menüye dönmek için /start kullanın.",
+    "timeout": "⏱ İstek zaman aşımına uğradı. Oluşturma çok uzun sürdü.\n\nLütfen daha basit bir komutla tekrar deneyin.",
+    "backend_unavailable": "❌ Hizmet geçici olarak kullanılamıyor. Lütfen birkaç dakika içinde tekrar deneyin.",
+    "invalid_photo": "❌ Geçersiz fotoğraf. Lütfen JPG veya PNG görüntüsü gönderin.",
+    "photo_too_large": "❌ Fotoğraf çok büyük. Maksimum {max_mb}MB izin verilir.",
+    "photo_too_small": "❌ Fotoğraf çözünürlüğü çok düşük. En az 512x512 piksel gerekli."
+  },
+  "buttons": {
+    "back_to_menu": "🔙 Menüye Dön",
+    "cancel": "❌ İptal",
+    "done": "✅ Tamam",
+    "retry": "🔄 Tekrar Dene"
+  },
+  "common": {
+    "please_wait": "⏳ Lütfen bekleyin...",
+    "processing": "⚙️ İşleniyor...",
+    "loading": "🔄 Yükleniyor..."
+  }
+}

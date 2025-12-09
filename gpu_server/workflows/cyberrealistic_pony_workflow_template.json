@@ -1,0 +1,136 @@
+{
+  "1": {
+    "inputs": {
+      "ckpt_name": "cyberrealisticPony_v14.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load CyberRealistic Pony v14"
+    }
+  },
+  "2": {
+    "inputs": {
+      "vae_name": "sdxl_vae.safetensors"
+    },
+    "class_type": "VAELoader",
+    "_meta": {
+      "title": "Load SDXL VAE"
+    }
+  },
+  "3": {
+    "inputs": {
+      "seed": 42,
+      "steps": 30,
+      "cfg": 7.0,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "karras",
+      "denoise": 1,
+      "model": ["11", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "4": {
+    "inputs": {
+      "samples": ["3", 0],
+      "vae": ["2", 0]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "5": {
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent Image"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "score_9, score_8_up, score_7_up, score_6_up, score_5_up, score_4_up, rating_explicit, source_anime, masterpiece, best quality, ultra detailed, 8k, photorealistic, highly detailed face, perfect lighting, cinematic, professional photography",
+      "clip": ["1", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Positive Prompt"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "embedding:bad_dream, embedding:easynegative, score_4, score_5, score_6, low quality, worst quality, bad anatomy, bad hands, missing fingers, extra fingers, blurry, cropped, jpeg artifacts, watermark, signature, text, censored, deformed, ugly, old, fat, duplicate, mutation",
+      "clip": ["1", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative Prompt"
+    }
+  },
+  "8": {
+    "inputs": {
+      "filename_prefix": "cyberrealistic_pony",
+      "images": ["12", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "10": {
+    "inputs": {
+      "lora_name": "add_detail.safetensors",
+      "strength_model": 0.5,
+      "strength_clip": 0.5,
+      "model": ["1", 0],
+      "clip": ["1", 1]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA - Detail Enhancer"
+    }
+  },
+  "11": {
+    "inputs": {
+      "lora_name": "eyes_detail.safetensors",
+      "strength_model": 0.4,
+      "strength_clip": 0.4,
+      "model": ["10", 0],
+      "clip": ["10", 1]
+    },
+    "class_type": "LoraLoader",
+    "_meta": {
+      "title": "Load LoRA - Eye Detail (Optional)"
+    }
+  },
+  "12": {
+    "inputs": {
+      "upscale_model_name": "RealESRGAN_x4plus.pth",
+      "image": ["4", 0]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Upscale 4x"
+    }
+  },
+  "13": {
+    "inputs": {
+      "facedetection": "retinaface_resnet50",
+      "codeformer_fidelity": 0.75,
+      "image": ["12", 0]
+    },
+    "class_type": "FaceRestoreCFWithModel",
+    "_meta": {
+      "title": "Restore Face (CodeFormer)"
+    }
+  }
+}

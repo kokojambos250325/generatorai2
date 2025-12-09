@@ -8,19 +8,22 @@ import logging
 
 from config import get_settings
 from routers import health, generate
-from utils.logging import setup_logging
+from utils.json_logging import setup_json_logging
 
 settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle manager"""
-    # Startup
-    setup_logging(settings.log_level)
-    logger = logging.getLogger(__name__)
+    # Startup - Set up JSON logging
+    logger = setup_json_logging(
+        service_name="backend",
+        log_file_path="/workspace/logs/backend.log",
+        log_level=settings.log_level
+    )
     logger.info(f"🚀 Starting {settings.api_title} v{settings.api_version}")
     logger.info(f"📡 GPU Service URL: {settings.gpu_service_url}")
-    logger.info(f"⚙️  Mode: MVP (stub endpoints)")
+    logger.info("⚙️  Mode: Three-mode generation with quality profiles")
     
     yield
     

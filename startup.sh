@@ -100,6 +100,29 @@ start_service() {
     fi
 }
 
+# Start ComfyUI (must start before GPU Server)
+log "======================================"
+log "Starting ComfyUI"
+log "======================================"
+
+start_service \
+    "ComfyUI" \
+    "$WORKSPACE/ComfyUI" \
+    "python main.py --listen 0.0.0.0 --port 8188" \
+    "$LOGS_DIR/comfyui.log" \
+    "$WORKSPACE/comfyui.pid"
+
+# Wait for ComfyUI to be ready
+log "Waiting for ComfyUI to be ready..."
+sleep 10
+
+# Check ComfyUI health
+if curl -s http://localhost:8188/system_stats > /dev/null 2>&1; then
+    log "ComfyUI is responding"
+else
+    log_warn "ComfyUI is not responding yet (this may be normal on first start)"
+fi
+
 # Start GPU Server (must start first)
 log "======================================"
 log "Starting GPU Server"
@@ -169,6 +192,18 @@ log "======================================"
 log ""
 log "Service Status:"
 log "---------------"
+
+# Check ComfyUI
+if [ -f "$WORKSPACE/comfyui.pid" ]; then
+    pid=$(cat "$WORKSPACE/comfyui.pid")
+    if ps -p "$pid" > /dev/null 2>&1; then
+        log "✓ ComfyUI: RUNNING (PID: $pid)"
+    else
+        log_error "✗ ComfyUI: FAILED"
+    fi
+else
+    log_error "✗ ComfyUI: NO PID FILE"
+fi
 
 # Check GPU Server
 if [ -f "$WORKSPACE/gpu_server.pid" ]; then

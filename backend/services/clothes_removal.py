@@ -62,16 +62,19 @@ class ClothesRemovalService:
             "target_image": request.target_image,
             "model": style_config["model"],
             "strength": style_config["strength"],
-            "controlnet": {
-                "openpose": True,
-                "depth": True,
-                "canny": True
-            },
-            "segmentation": True,
+            "controlnet_strength": request.controlnet_strength,
+            "inpaint_denoise": request.inpaint_denoise,
+            "segmentation_threshold": request.segmentation_threshold,
             "negative_prompt": "clothing, dressed, covered, clothes, shirt, pants"
         }
         
-        logger.debug(f"Clothes removal params: model={params['model']}, strength={params['strength']}")
+        # Add optional parameters
+        if request.seed is not None and request.seed != -1:
+            params["seed"] = request.seed
+        if request.steps:
+            params["steps"] = request.steps
+        
+        logger.debug(f"Clothes removal params: model={params['model']}, controlnet={params['controlnet_strength']}")
         
         # Call GPU service
         result = await self.gpu_client.generate(

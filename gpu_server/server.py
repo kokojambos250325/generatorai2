@@ -2,7 +2,7 @@
 GPU Server - ComfyUI Integration Service
 
 Wraps ComfyUI API and provides simplified HTTP interface for backend.
-MVP: Supports free_generation and clothes_removal workflows.
+Supports free_generation and clothes_removal workflows.
 
 This server runs on the RunPod POD and communicates with:
 - ComfyUI API (localhost:8188)
@@ -15,16 +15,21 @@ from pydantic import BaseModel
 from typing import Dict, Any, Optional
 import logging
 import uvicorn
+import uuid
 
 from comfy_client import ComfyUIClient
 from config import get_settings
+from json_logging import setup_json_logging, log_event
 
-# Setup logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+# Initialize settings
+settings = get_settings()
+
+# Setup JSON logging
+logger = setup_json_logging(
+    service_name="gpu_server",
+    log_file_path="/workspace/logs/gpu_server.log",
+    log_level=settings.log_level
 )
-logger = logging.getLogger(__name__)
 
 # Initialize FastAPI app
 app = FastAPI(
@@ -33,8 +38,7 @@ app = FastAPI(
     description="ComfyUI wrapper for AI image generation"
 )
 
-# Initialize settings and ComfyUI client
-settings = get_settings()
+# Initialize ComfyUI client
 comfy_client = ComfyUIClient(
     comfyui_url=settings.comfyui_api_url,
     workflows_path=settings.workflows_path,
@@ -46,6 +50,7 @@ class GenerationRequest(BaseModel):
     """Request schema for generation"""
     workflow: str  # free_generation or clothes_removal
     params: Dict[str, Any]
+    request_id: Optional[str] = None  # Optional request_id from backend for tracing
 
 
 class GenerationResponse(BaseModel):
@@ -89,7 +94,7 @@ async def generate(request: GenerationRequest):
     """
     Generate image using specified workflow.
     
-    MVP supports:
+    Supports:
     - free_generation: Text-to-image with style
     - clothes_removal: Remove clothes with ControlNet
     
@@ -99,8 +104,27 @@ async def generate(request: GenerationRequest):
     Returns:
         GenerationResponse: Result with base64 image or error
     """
+    # Generate generation_id for GPU-level tracking
+    generation_id = str(uuid.uuid4())
+    request_id = request.request_id
+    
     try:
-        logger.info(f"Received generation request: workflow={request.workflow}")
+        # Log incoming request
+        log_event(
+            logger=logger,
+            level="INFO",
+            event="execute_request",
+            message=f"Execute request: workflow={request.workflow}",
+            request_id=request_id,
+            generation_id=generation_id,
+            workflow=request.workflow,
+            params_summary={
+                "steps": request.params.get("steps"),
+                "cfg": request.params.get("cfg"),
+                "width": request.params.get("width"),
+                "height": request.params.get("height")
+            }
+        )
         
         # Validate workflow
         if request.workflow not in ["free_generation", "clothes_removal"]:
@@ -112,10 +136,21 @@ async def generate(request: GenerationRequest):
         # Execute workflow
         result_image = await comfy_client.execute_workflow(
             workflow_name=request.workflow,
-            params=request.params
+            params=request.params,
+            generation_id=generation_id,
+            request_id=request_id
         )
         
-        logger.info(f"Generation completed successfully for workflow={request.workflow}")
+        # Log success
+        log_event(
+            logger=logger,
+            level="INFO",
+            event="generation_complete",
+            message=f"Generation completed successfully",
+            request_id=request_id,
+            generation_id=generation_id,
+            workflow=request.workflow
+        )
         
         return GenerationResponse(
             status="done",
@@ -127,7 +162,17 @@ async def generate(request: GenerationRequest):
         raise
     
     except Exception as e:
-        logger.error(f"Generation failed: {str(e)}", exc_info=True)
+        # Log error
+        log_event(
+            logger=logger,
+            level="ERROR",
+            event="generation_error",
+            message=f"Generation failed: {str(e)}",
+            request_id=request_id,
+            generation_id=generation_id,
+            error_type=type(e).__name__,
+            error_message=str(e)
+        )
         return GenerationResponse(
             status="failed",
             image=None,

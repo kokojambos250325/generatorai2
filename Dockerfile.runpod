@@ -1,0 +1,41 @@
+# RunPod Serverless Dockerfile
+# Optimized for fast cold starts and efficient GPU usage
+
+FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
+
+# Set working directory
+WORKDIR /workspace
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    wget \
+    curl \
+    build-essential \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+COPY gpu_server/deployment/requirements.txt ./gpu_requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt && \
+    pip install --no-cache-dir -r gpu_requirements.txt && \
+    pip install --no-cache-dir runpod
+
+# Copy application code
+COPY . .
+
+# Set Python path
+ENV PYTHONPATH=/workspace:$PYTHONPATH
+
+# Create model cache directory
+RUN mkdir -p /workspace/models /workspace/outputs
+
+# Download models (optional - uncomment if you want to bake models into image)
+# RUN python scripts/download_models.py
+
+# Set the handler as entrypoint
+CMD ["python", "-u", "runpod_handler.py"]

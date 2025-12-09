@@ -1,0 +1,2 @@
+@echo off
+docker run --rm -v runpod-ssh:/root/.ssh alpine sh -c "apk add openssh-client -q && chmod 600 /root/.ssh/id_ed25519 && ssh -o StrictHostKeyChecking=no p8q2agahufxw4a-64410d8e@ssh.runpod.io 'cd /workspace/ai-generator && . /workspace/ComfyUI/venv/bin/activate && pip install -q python-telegram-bot python-dotenv pydantic-settings requests && nohup python run_telegram_bot.py > /workspace/.runpod/logs/telegram_bot.log 2>&1 & sleep 3 && ps aux | grep run_telegram_bot | grep -v grep'"

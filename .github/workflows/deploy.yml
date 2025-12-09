@@ -1,0 +1,94 @@
+name: Deploy to RunPod
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup SSH Key
+        env:
+          SSH_KEY: ${{ secrets.RUNPOD_SSH_KEY }}
+          SSH_HOST: ${{ secrets.RUNPOD_SSH_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/runpod_key
+          chmod 600 ~/.ssh/runpod_key
+          ssh-keyscan -H "${SSH_HOST}" >> ~/.ssh/known_hosts
+
+      - name: Deploy to RunPod via SSH
+        env:
+          SSH_HOST: ${{ secrets.RUNPOD_SSH_HOST }}
+          SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
+          REPO: ${{ github.repository }}
+        run: |
+          echo "🚀 Начинаем деплой на RunPod..."
+          
+          # Проверка подключения
+          ssh -i ~/.ssh/runpod_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "echo 'SSH connection OK'"
+          
+          # Клонирование или обновление репозитория
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace && if [ -d ai-generator ]; then cd ai-generator && git fetch origin && git reset --hard origin/main; else git clone https://github.com/${REPO}.git ai-generator; fi"
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && git log -1 --oneline"
+
+      - name: Install dependencies
+        env:
+          SSH_HOST: ${{ secrets.RUNPOD_SSH_HOST }}
+          SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
+        run: |
+          echo "📚 Установка зависимостей..."
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && source /workspace/ComfyUI/venv/bin/activate && pip install -r requirements.txt --quiet && echo 'Dependencies installed'"
+
+      - name: Restart services
+        env:
+          SSH_HOST: ${{ secrets.RUNPOD_SSH_HOST }}
+          SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
+        run: |
+          echo "🔄 Перезапуск сервисов..."
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "pkill -f 'uvicorn.*main:app' || true; pkill -f 'python.*telegram' || true; sleep 2"
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator/gpu_server/server && source /workspace/ComfyUI/venv/bin/activate && nohup python -m uvicorn main:app --host 0.0.0.0 --port 3000 > /tmp/fastapi.log 2>&1 &"
+          echo "Waiting for services to start..."
+          sleep 10
+
+      - name: Health check
+        env:
+          SSH_HOST: ${{ secrets.RUNPOD_SSH_HOST }}
+          SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
+          RUNPOD_POD_URL: ${{ secrets.RUNPOD_POD_URL }}
+        run: |
+          echo "🏥 Проверка работоспособности..."
+          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "ps aux | grep -E '(uvicorn|ComfyUI)' | grep -v grep || echo 'No processes found'"
+          
+          echo "Checking FastAPI via proxy..."
+          for i in 1 2 3 4 5; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "${RUNPOD_POD_URL}/health" 2>/dev/null || echo "000")
+            if [ "$HTTP_CODE" = "200" ]; then
+              echo "✓ FastAPI working (HTTP $HTTP_CODE)"
+              break
+            fi
+            echo "Attempt $i/5: HTTP $HTTP_CODE"
+            sleep 5
+          done
+
+      - name: Deployment summary
+        env:
+          RUNPOD_POD_URL: ${{ secrets.RUNPOD_POD_URL }}
+        run: |
+          echo "## ✅ Деплой завершён" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 🔗 Сервисы" >> $GITHUB_STEP_SUMMARY
+          echo "- **FastAPI**: ${RUNPOD_POD_URL}:3000/docs" >> $GITHUB_STEP_SUMMARY
+          echo "- **ComfyUI**: ${RUNPOD_POD_URL}:8188" >> $GITHUB_STEP_SUMMARY
+          echo "- **Health**: ${RUNPOD_POD_URL}:3000/health" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 📝 Коммит" >> $GITHUB_STEP_SUMMARY
+          echo "- **SHA**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch**: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Author**: ${{ github.actor }}" >> $GITHUB_STEP_SUMMARY

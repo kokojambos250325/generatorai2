@@ -202,6 +202,28 @@ class ComfyUIClient:
                 
                 return prompt_id
         
+        except httpx.HTTPStatusError as e:
+            # Log detailed error response for 400 errors
+            error_detail = "No detail available"
+            try:
+                error_detail = e.response.text
+            except:
+                pass
+            
+            log_event(
+                logger=logger,
+                level="ERROR",
+                event="error_comfyui",
+                message=f"Failed to submit workflow: {e}",
+                generation_id=generation_id,
+                request_id=request_id,
+                error_type=type(e).__name__,
+                endpoint="/prompt",
+                status_code=e.response.status_code,
+                error_detail=error_detail[:500]
+            )
+            raise Exception(f"Workflow submission failed: {str(e)} - Details: {error_detail[:200]}")
+        
         except Exception as e:
             log_event(
                 logger=logger,

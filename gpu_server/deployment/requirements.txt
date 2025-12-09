@@ -1,0 +1,35 @@
+# GPU Server Requirements
+# CUDA-enabled PyTorch and dependencies for SDXL/ControlNet inference
+
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+pydantic==2.5.0
+
+# HTTP client
+httpx==0.25.2
+
+# PyTorch with CUDA support
+--extra-index-url https://download.pytorch.org/whl/cu121
+torch==2.1.0+cu121
+torchvision==0.16.0+cu121
+torchaudio==2.1.0+cu121
+
+# Diffusers and Transformers
+diffusers==0.24.0
+transformers==4.36.0
+accelerate==0.25.0
+safetensors==0.4.1
+
+# InsightFace
+insightface==0.7.3
+onnxruntime-gpu==1.16.3
+
+# Image processing
+opencv-python==4.8.1.78
+opencv-contrib-python==4.8.1.78
+Pillow==10.1.0
+
+# Additional dependencies
+numpy==1.26.2
+scipy==1.11.4

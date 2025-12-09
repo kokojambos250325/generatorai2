@@ -1,0 +1,204 @@
+{
+  "3": {
+    "inputs": {
+      "seed": 12345,
+      "steps": 30,
+      "cfg": 7.5,
+      "sampler_name": "dpmpp_2m_sde",
+      "scheduler": "karras",
+      "denoise": 1.0,
+      "model": ["26", 0],
+      "positive": ["6", 0],
+      "negative": ["7", 0],
+      "latent_image": ["5", 0]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "4": {
+    "inputs": {
+      "ckpt_name": "cyberrealisticPony_v14.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "Load Checkpoint"
+    }
+  },
+  "5": {
+    "inputs": {
+      "width": 1024,
+      "height": 1024,
+      "batch_size": 1
+    },
+    "class_type": "EmptyLatentImage",
+    "_meta": {
+      "title": "Empty Latent"
+    }
+  },
+  "6": {
+    "inputs": {
+      "text": "beautiful woman, nsfw, nude, intimate scene, high quality, detailed",
+      "clip": ["4", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Scene Prompt"
+    }
+  },
+  "7": {
+    "inputs": {
+      "text": "low quality, blurry, deformed, bad anatomy, censored, clothes",
+      "clip": ["4", 1]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Negative Prompt"
+    }
+  },
+  "8": {
+    "inputs": {
+      "samples": ["3", 0],
+      "vae": ["4", 2]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "VAE Decode"
+    }
+  },
+  "9": {
+    "inputs": {
+      "filename_prefix": "nsfw_face",
+      "images": ["29", 0]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Save Image"
+    }
+  },
+  "20": {
+    "inputs": {
+      "image": "face1.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Face Loader 1"
+    }
+  },
+  "21": {
+    "inputs": {
+      "image": "face2.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Face Loader 2"
+    }
+  },
+  "22": {
+    "inputs": {
+      "image": "face3.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Face Loader 3"
+    }
+  },
+  "23": {
+    "inputs": {
+      "image": "face4.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Face Loader 4"
+    }
+  },
+  "24": {
+    "inputs": {
+      "image": "face5.png",
+      "upload": "image"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Face Loader 5"
+    }
+  },
+  "25": {
+    "inputs": {
+      "provider": "CPU",
+      "merge_mode": "average",
+      "images": [
+        ["20", 0],
+        ["21", 0],
+        ["22", 0],
+        ["23", 0],
+        ["24", 0]
+      ]
+    },
+    "class_type": "InsightFaceBatchLoader",
+    "_meta": {
+      "title": "Face Embedding Batch"
+    }
+  },
+  "26": {
+    "inputs": {
+      "weight": 0.8,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0.0,
+      "end_at": 1.0,
+      "embeds_scaling": "V only",
+      "model": ["4", 0],
+      "ipadapter": ["30", 0],
+      "image": ["20", 0],
+      "clip_vision": ["30", 1]
+    },
+    "class_type": "IPAdapterApply",
+    "_meta": {
+      "title": "IP-Adapter FaceID Plus"
+    }
+  },
+  "27": {
+    "inputs": {
+      "fidelity": 0.8,
+      "device": "cuda",
+      "image": ["8", 0]
+    },
+    "class_type": "FaceRestore",
+    "_meta": {
+      "title": "Face Restoration"
+    }
+  },
+  "28": {
+    "inputs": {
+      "model_name": "RealESRGAN_x2.pth"
+    },
+    "class_type": "UpscaleModelLoader",
+    "_meta": {
+      "title": "Upscale Model Loader"
+    }
+  },
+  "29": {
+    "inputs": {
+      "upscale_model": ["28", 0],
+      "image": ["27", 0]
+    },
+    "class_type": "ImageUpscaleWithModel",
+    "_meta": {
+      "title": "Apply Upscale"
+    }
+  },
+  "30": {
+    "inputs": {
+      "ipadapter_file": "ip-adapter-faceid-plusv2_sd15.bin"
+    },
+    "class_type": "IPAdapterModelLoader",
+    "_meta": {
+      "title": "Load IP-Adapter FaceID Plus Model"
+    }
+  }
+}
