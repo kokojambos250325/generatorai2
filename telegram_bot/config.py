@@ -25,6 +25,10 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = "INFO"
     
+    # Language settings
+    default_language: str = "en"
+    language_persistence_file: str = "/workspace/telegram_bot/data/user_languages.json"
+    
     class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"

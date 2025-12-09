@@ -1,45 +1,38 @@
 """
-Health Check Router
-
-Provides service health status and GPU availability check.
+Health check router
 """
-
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter
 import logging
 
-from schemas.response_generate import HealthResponse
 from clients.gpu_client import GPUClient
-from config import get_settings, Settings
+from config import get_settings
 
-router = APIRouter()
+router = APIRouter(prefix="/health", tags=["Health"])
+settings = get_settings()
 logger = logging.getLogger(__name__)
 
 
-@router.get("/health", response_model=HealthResponse)
-async def health_check(settings: Settings = Depends(get_settings)):
+@router.get("")
+async def health_check():
     """
-    Check service health and GPU availability.
+    Health check endpoint
     
     Returns:
-        HealthResponse: Service status and GPU availability
+        status: healthy | degraded | unhealthy
+        gpu_available: GPU service connectivity
+        version: API version
     """
-    try:
-        # Check GPU service connectivity
-        gpu_client = GPUClient(settings.gpu_service_url, settings.request_timeout)
-        gpu_available = await gpu_client.check_health()
-        
-        logger.info(f"Health check: GPU available={gpu_available}")
-        
-        return HealthResponse(
-            status="healthy" if gpu_available else "degraded",
-            gpu_available=gpu_available,
-            version=settings.api_version
-        )
+    gpu_client = GPUClient(settings.gpu_service_url)
+    gpu_available = await gpu_client.check_health()
     
-    except Exception as e:
-        logger.error(f"Health check failed: {e}")
-        return HealthResponse(
-            status="unhealthy",
-            gpu_available=False,
-            version=settings.api_version
-        )
+    if gpu_available:
+        status = "healthy"
+    else:
+        status = "degraded"
+        logger.warning("GPU service not available")
+    
+    return {
+        "status": status,
+        "gpu_available": gpu_available,
+        "version": settings.api_version
+    }

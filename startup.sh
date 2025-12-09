@@ -117,7 +117,7 @@ log "Waiting for GPU server to be ready..."
 sleep 5
 
 # Check GPU server health
-if curl -s http://localhost:8001/health > /dev/null 2>&1; then
+if curl -s http://localhost:8002/health > /dev/null 2>&1; then
     log "GPU server is responding"
 else
     log_warn "GPU server is not responding yet (this may be normal on first start)"

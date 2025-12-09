@@ -14,7 +14,7 @@ class Settings(BaseSettings):
     
     # Server Configuration
     gpu_server_host: str = "0.0.0.0"
-    gpu_server_port: int = 8001
+    gpu_server_port: int = 8002
     
     # ComfyUI Configuration
     comfyui_api_url: str = "http://localhost:8188"

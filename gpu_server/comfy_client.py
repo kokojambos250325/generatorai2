@@ -77,33 +77,43 @@ class ComfyUIClient:
         """
         Inject dynamic parameters into workflow.
         
-        This is a simplified implementation. In production, you would:
-        1. Parse workflow structure
-        2. Find parameter injection points by node type
-        3. Replace placeholders with actual values
-        
         Args:
             workflow: Base workflow definition
-            params: Parameters to inject
+            params: Parameters to inject (prompt, seed, steps, cfg, etc.)
         
         Returns:
             dict: Workflow with injected parameters
         """
-        # NOTE: This is a placeholder implementation
-        # Real implementation requires parsing workflow nodes and replacing values
-        
         logger.info(f"Injecting parameters: {list(params.keys())}")
         
-        # Make a copy to avoid modifying original
-        modified_workflow = workflow.copy()
+        # Deep copy to avoid modifying original
+        import copy
+        modified_workflow = copy.deepcopy(workflow)
         
-        # TODO: Implement actual parameter injection based on workflow structure
-        # This would involve:
-        # - Finding text prompt nodes and updating with params['prompt']
-        # - Finding checkpoint loader nodes and updating with params['model']
-        # - Finding sampler nodes and updating steps, cfg_scale, seed
-        # - Finding LoRA nodes and updating with params['lora']
-        # - etc.
+        # Inject prompt into CLIPTextEncode node (node 6)
+        if "prompt" in params and "6" in modified_workflow:
+            modified_workflow["6"]["inputs"]["text"] = params["prompt"]
+            logger.info(f"Injected prompt: {params['prompt']}")
+        
+        # Inject negative prompt if provided
+        if "negative_prompt" in params and "7" in modified_workflow:
+            modified_workflow["7"]["inputs"]["text"] = params["negative_prompt"]
+        
+        # Inject sampling parameters into KSampler (node 3)
+        if "3" in modified_workflow:
+            if "seed" in params:
+                modified_workflow["3"]["inputs"]["seed"] = params["seed"]
+            if "steps" in params:
+                modified_workflow["3"]["inputs"]["steps"] = params["steps"]
+            if "cfg" in params:
+                modified_workflow["3"]["inputs"]["cfg"] = params["cfg"]
+        
+        # Inject image dimensions into EmptyLatentImage (node 5)
+        if "5" in modified_workflow:
+            if "width" in params:
+                modified_workflow["5"]["inputs"]["width"] = params["width"]
+            if "height" in params:
+                modified_workflow["5"]["inputs"]["height"] = params["height"]
         
         return modified_workflow
     
