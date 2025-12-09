@@ -81,7 +81,7 @@ async def generate_image(request: FreeGenerationRequest):
             error_type=type(e).__name__,
             error_message=str(e)
         )
-        return GenerationResponse.error(error_message=str(e), task_id=request_id)
+        return GenerationResponse.create_error(error_message=str(e), task_id=request_id)
 
 
 @router.post("/nsfw_face")
@@ -145,4 +145,4 @@ async def generate_nsfw_face(request: NSFWFaceRequest):
             error_type=type(e).__name__,
             error_message=str(e)
         )
-        return GenerationResponse.error(error_message=str(e), task_id=request_id)
+        return GenerationResponse.create_error(error_message=str(e), task_id=request_id)

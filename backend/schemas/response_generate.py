@@ -30,7 +30,7 @@ class GenerationResponse(BaseModel):
         )
     
     @classmethod
-    def error(cls, error_message: str, task_id: Optional[str] = None) -> "GenerationResponse":
+    def create_error(cls, error_message: str, task_id: Optional[str] = None) -> "GenerationResponse":
         """Create error response"""
         return cls(
             task_id=task_id or str(uuid.uuid4()),
