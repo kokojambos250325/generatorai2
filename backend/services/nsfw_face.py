@@ -7,10 +7,10 @@ Handles NSFW generation with multi-face consistency using IP-Adapter FaceID Plus
 import logging
 from typing import Dict, Any
 
-from schemas.request_free import NSFWFaceRequest
-from clients.gpu_client import GPUClient
-from services.param_resolver import ParameterResolver
-from config import STYLE_CONFIG
+from backend.schemas.request_free import NSFWFaceRequest
+from backend.clients.gpu_client import GPUClient
+from backend.services.param_resolver import ParameterResolver
+from backend.config import STYLE_CONFIG
 
 logger = logging.getLogger(__name__)
 

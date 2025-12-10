@@ -1,189 +1,179 @@
 """
 Face Swap Handler
+
+Handles face swap functionality.
 """
 import logging
+import base64
+import time
 from telegram import Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import ContextTypes
+
 from telegram_bot.api_client import BackendAPIClient
-from telegram_bot.utils.validators import validate_image_size
-from telegram_bot.utils.image_handler import download_image, encode_image_to_base64, decode_base64_to_image, create_image_bytesio
-from telegram_bot.config import get_bot_settings
-import asyncio
+from telegram_bot.utils.locale import LocaleManager
+from telegram_bot.utils.keyboards import get_main_menu_keyboard
+from telegram_bot.utils.validators import validate_photo
+from telegram_bot.utils.logger import get_bot_logger
+from telegram_bot.utils.error_handler import send_error_message
+from telegram_bot.states import set_user_state, clear_user_state
 
 logger = logging.getLogger(__name__)
-settings = get_bot_settings()
+bot_logger = get_bot_logger()
+api_client = BackendAPIClient()
 
 # Conversation states
-WAITING_FACE_SWAP_SOURCE, WAITING_FACE_SWAP_TARGET = range(2)
+WAITING_FACE_SWAP_SOURCE = "face_swap_waiting_source"
+WAITING_FACE_SWAP_TARGET = "face_swap_waiting_target"
 
 
-async def handle_face_swap(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+def get_locale(context: ContextTypes.DEFAULT_TYPE) -> LocaleManager:
+    """Helper to get locale from bot_data"""
+    return context.bot_data.get('locale_manager')
+
+
+async def handle_face_swap(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Start face swap flow
     """
     query = update.callback_query
-    await query.answer()
+    if query:
+        await query.answer()
     
-    await query.edit_message_text(
-        text="🔄 *Замена лица*\n\n"
-             "Отправьте *исходное фото* (откуда взять лицо).\n\n"
-             "Для отмены используйте /cancel",
-        parse_mode='Markdown'
-    )
+    user_id = update.effective_user.id
+    locale = get_locale(context)
+    lang = locale.get_user_language(user_id)
     
-    return WAITING_FACE_SWAP_SOURCE
+    # Set state
+    set_user_state(context, WAITING_FACE_SWAP_SOURCE)
+    context.user_data['mode'] = 'face_swap'
+    
+    start_text = locale.get_text("face_swap.start", lang)
+    
+    if query:
+        await query.edit_message_text(start_text, parse_mode="Markdown")
+    else:
+        await update.message.reply_text(start_text, parse_mode="Markdown")
+    
+    bot_logger.log_action(user_id, "face_swap_started", mode="face_swap")
 
 
-async def process_face_swap_source(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def process_face_swap_source(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Process source face image
     """
+    user_id = update.effective_user.id
+    locale = get_locale(context)
+    lang = locale.get_user_language(user_id)
+    
     if not update.message.photo:
-        await update.message.reply_text("❌ Please send a photo")
-        return WAITING_FACE_SWAP_SOURCE
+        await update.message.reply_text(locale.get_text("errors.photo_required", lang))
+        return
     
     photo = update.message.photo[-1]  # Get highest resolution
+    photo_file = await photo.get_file()
+    photo_bytes = await photo_file.download_as_bytearray()
     
-    # Validate image size
-    is_valid, error = validate_image_size(photo.file_size)
+    # Validate photo
+    is_valid, error_msg, metadata = validate_photo(
+        bytes(photo_bytes),
+        max_mb=10,
+        min_width=512,
+        min_height=512,
+        require_face=True
+    )
+    
     if not is_valid:
-        await update.message.reply_text(error)
-        return WAITING_FACE_SWAP_SOURCE
+        await update.message.reply_text(error_msg)
+        return
     
-    # Download image
-    image_bytes = await download_image(photo)
-    if not image_bytes:
-        await update.message.reply_text("❌ Failed to download image")
-        return WAITING_FACE_SWAP_SOURCE
+    # Convert to base64
+    face_base64 = base64.b64encode(photo_bytes).decode('utf-8')
     
     # Store in context
-    context.user_data['face_swap_source'] = encode_image_to_base64(image_bytes)
+    context.user_data['face_swap_source'] = face_base64
+    set_user_state(context, WAITING_FACE_SWAP_TARGET)
     
     await update.message.reply_text(
-        "✅ Исходное фото получено!\n\n"
-        "Теперь отправьте *целевое фото* (куда вставить лицо).",
+        locale.get_text("face_swap.source_received", lang),
         parse_mode='Markdown'
     )
     
-    return WAITING_FACE_SWAP_TARGET
+    bot_logger.log_action(user_id, "face_swap_source_received", mode="face_swap")
 
 
-async def process_face_swap_target(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
+async def process_face_swap_target(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Process target image and submit task
     """
+    user_id = update.effective_user.id
+    locale = get_locale(context)
+    lang = locale.get_user_language(user_id)
+    
     if not update.message.photo:
-        await update.message.reply_text("❌ Please send a photo")
-        return WAITING_FACE_SWAP_TARGET
+        await update.message.reply_text(locale.get_text("errors.photo_required", lang))
+        return
     
     photo = update.message.photo[-1]
+    photo_file = await photo.get_file()
+    photo_bytes = await photo_file.download_as_bytearray()
     
-    # Validate image size
-    is_valid, error = validate_image_size(photo.file_size)
+    # Validate photo
+    is_valid, error_msg, metadata = validate_photo(
+        bytes(photo_bytes),
+        max_mb=10,
+        min_width=512,
+        min_height=512
+    )
+    
     if not is_valid:
-        await update.message.reply_text(error)
-        return WAITING_FACE_SWAP_TARGET
+        await update.message.reply_text(error_msg)
+        return
     
-    # Download image
-    image_bytes = await download_image(photo)
-    if not image_bytes:
-        await update.message.reply_text("❌ Failed to download image")
-        return WAITING_FACE_SWAP_TARGET
-    
-    target_image = encode_image_to_base64(image_bytes)
+    # Convert to base64
+    target_image = base64.b64encode(photo_bytes).decode('utf-8')
     source_image = context.user_data.get('face_swap_source')
     
     if not source_image:
-        await update.message.reply_text("❌ Source image not found. Please start over with /start")
-        return ConversationHandler.END
+        await update.message.reply_text(locale.get_text("errors.generic", lang))
+        clear_user_state(context)
+        return
     
-    # Send processing message
+    # Set generating state
+    set_user_state(context, "face_swap_generating")
+    
+    # Show processing message
     processing_msg = await update.message.reply_text(
-        "⏳ Submitting face swap task...\n"
-        "This may take several minutes."
+        locale.get_text("face_swap.processing", lang),
+        parse_mode='Markdown'
     )
     
+    start_time = time.time()
+    
     try:
-        # Submit task to backend
-        api_client = BackendAPIClient()
-        task_id = await api_client.submit_task(
-            mode="face_swap",
-            face_image=source_image,
-            image=target_image
-        )
-        
-        logger.info(f"Face swap task submitted: {task_id}")
-        
+        # TODO: Integrate with face swap API endpoint when available
+        # For now, show coming soon message
         await processing_msg.edit_text(
-            f"✅ Task submitted!\n"
-            f"Task ID: `{task_id}`\n\n"
-            f"⏳ Processing... Please wait.",
+            locale.get_text("face_swap.coming_soon", lang),
             parse_mode='Markdown'
         )
         
-        # Poll for result
-        poll_count = 0
-        while poll_count < settings.MAX_POLL_ATTEMPTS:
-            await asyncio.sleep(settings.STATUS_POLL_INTERVAL)
-            poll_count += 1
-            
-            status_data = await api_client.check_status(task_id)
-            status = status_data.get("status")
-            
-            if poll_count % 5 == 0:
-                progress = status_data.get("progress", 0)
-                await processing_msg.edit_text(
-                    f"⏳ Processing... ({progress}%)\n"
-                    f"Task ID: `{task_id}`",
-                    parse_mode='Markdown'
-                )
-            
-            if status == "completed":
-                result_image_base64 = status_data.get("result")
-                
-                if result_image_base64:
-                    image_bytes = decode_base64_to_image(result_image_base64)
-                    image_file = create_image_bytesio(image_bytes)
-                    
-                    await update.message.reply_photo(
-                        photo=image_file,
-                        caption=f"✅ *Face Swap Complete!*\n\n"
-                                f"Task ID: `{task_id}`",
-                        parse_mode='Markdown'
-                    )
-                    
-                    await processing_msg.delete()
-                    logger.info(f"Face swap task {task_id} completed")
-                else:
-                    await processing_msg.edit_text("❌ Error: No result image received")
-                
-                break
-            
-            elif status == "failed":
-                error_msg = status_data.get("error", "Unknown error")
-                await processing_msg.edit_text(
-                    f"❌ Face swap failed!\n"
-                    f"Error: {error_msg}\n"
-                    f"Task ID: `{task_id}`",
-                    parse_mode='Markdown'
-                )
-                logger.error(f"Face swap task {task_id} failed: {error_msg}")
-                break
-        else:
-            # Timeout
-            await processing_msg.edit_text(
-                f"⏰ Task timeout!\n"
-                f"Task ID: `{task_id}`\n\n"
-                f"Use /status {task_id} to check later.",
-                parse_mode='Markdown'
-            )
+        bot_logger.log_action(user_id, "face_swap_requested", mode="face_swap")
     
     except Exception as e:
-        logger.error(f"Error in face swap: {str(e)}")
-        await processing_msg.edit_text(f"❌ Error: {str(e)}")
+        generation_time = time.time() - start_time
+        await send_error_message(update, context, e, lang)
+        
+        bot_logger.log_generation(
+            user_id=user_id,
+            mode="face_swap",
+            prompt=None,
+            style=None,
+            status="failed",
+            time_seconds=generation_time,
+            error=str(e)
+        )
     
     finally:
         # Clean up context
+        clear_user_state(context)
         context.user_data.pop('face_swap_source', None)
-    
-    return ConversationHandler.END

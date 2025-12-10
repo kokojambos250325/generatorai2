@@ -8,13 +8,13 @@ MVP: Supports free generation and clothes removal only.
 import logging
 from typing import Dict, Any
 
-from schemas.request_free import FreeGenerationRequest, NSFWFaceRequest
-from schemas.request_clothes import ClothesRemovalRequest
-from clients.gpu_client import GPUClient
-from services.free_generation import FreeGenerationService
-from services.free_generation_face import FreeGenerationFaceService
-from services.clothes_removal import ClothesRemovalService
-from services.nsfw_face import NSFWFaceService
+from backend.schemas.request_free import FreeGenerationRequest, NSFWFaceRequest
+from backend.schemas.request_clothes import ClothesRemovalRequest
+from backend.clients.gpu_client import GPUClient
+from backend.services.free_generation import FreeGenerationService
+from backend.services.free_generation_face import FreeGenerationFaceService
+from backend.services.clothes_removal import ClothesRemovalService
+from backend.services.nsfw_face import NSFWFaceService
 
 logger = logging.getLogger(__name__)
 

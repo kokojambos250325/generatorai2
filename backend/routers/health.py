@@ -4,8 +4,8 @@ Health check router
 from fastapi import APIRouter
 import logging
 
-from clients.gpu_client import GPUClient
-from config import get_settings
+from backend.clients.gpu_client import GPUClient
+from backend.config import get_settings
 
 router = APIRouter(prefix="/health", tags=["Health"])
 settings = get_settings()

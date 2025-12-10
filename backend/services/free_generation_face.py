@@ -7,9 +7,9 @@ Handles free text-to-image generation with face embedding using IP-Adapter FaceI
 import logging
 from typing import Dict, Any, List
 
-from schemas.request_free import FreeGenerationRequest
-from clients.gpu_client import GPUClient
-from services.param_resolver import ParameterResolver
+from backend.schemas.request_free import FreeGenerationRequest
+from backend.clients.gpu_client import GPUClient
+from backend.services.param_resolver import ParameterResolver
 
 logger = logging.getLogger(__name__)
 

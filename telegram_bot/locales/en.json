@@ -5,14 +5,27 @@
   },
   "main_menu": {
     "welcome": "👋 Welcome, {name}!\n\n🎨 **AI Image Generation Bot**\n\nI can help you create amazing images using AI. Choose a mode below:",
-    "btn_free": "🎨 Free Generation",
-    "btn_clothes": "👕 Remove Clothes",
-    "btn_nsfw_face": "🔥 NSFW with Face",
+    "btn_clothes": "📷 REMOVE CLOTHES",
+    "btn_video": "🎬 NEW Video Animation NEW",
+    "btn_free_face": "✨ Free Generation | Face Swap",
+    "btn_nsfw_face": "🔞 18 Create Erotica with Face 18",
+    "btn_balance": "💰 Balance",
+    "btn_topup": "💳 Top-up",
+    "btn_help": "🆘 SOS Help SOS",
+    "btn_create_bot": "🤖 Create Bot",
+    "btn_free": "🎨 Create Image",
     "btn_face_swap": "🔄 Face Swap",
     "btn_language": "🌐 Change Language",
+    "btn_profile": "👤 Profile",
     "btn_channel": "📢 Channel",
     "btn_support": "❓ Support",
-    "choose_mode": "Choose a mode:"
+    "choose_mode": "Choose a mode:",
+    "style_noir": "🎬 Noir",
+    "style_super_realism": "📸 Super Realism",
+    "style_anime": "✨ Anime",
+    "style_realism": "📸 Realism",
+    "style_lux": "✨ Lux",
+    "style_chatgpt": "🤖 ChatGPT"
   },
   "free_generation": {
     "start": "🎨 **Free Generation**\n\nSend me a text description of the image you want to generate.\n\nExample: *a beautiful mountain landscape at sunset, photorealistic*\n\nOr use /start to return to main menu.",
@@ -45,14 +58,15 @@
     "example_selected": "📋 Example selected! Now choose a style:"
   },
   "clothes_removal": {
-    "start": "👕 **Remove Clothes**\n\nSend me one photo of a person wearing clothes.\n\n⚠️ **Important:**\n- Photo must show full body or upper body\n- Clear, well-lit image works best\n- One person per photo\n\nOr use /start to return to main menu.",
+    "start": "👗 **Remove Clothes**\n\nSend me one photo of a person wearing clothes.\n\n⚠️ **Important:**\n- Photo must show full body or upper body\n- Clear, well-lit image works best\n- One person per photo\n\nOr use /start to return to main menu.",
     "photo_received": "✅ Photo received! Analyzing...",
+    "confirmation": "⚠️ **Confirmation**\n\nWe will remove clothes as anatomically accurate as possible. Confirm action?",
     "choose_style": "Photo received! Now choose output style:",
     "style_realism": "📸 Realism",
     "style_lux": "✨ Lux",
     "style_anime": "🎌 Anime",
     "style_selection": "Choose output style:",
-    "processing": "👕 Processing image with **{style}** style...\n\n⚙️ Analyzing pose and structure...\n⏳ This may take 60-120 seconds. Please wait.",
+    "processing": "👗 Processing image with **{style}** style...\n\n⚙️ Analyzing pose and structure...\n⏳ This may take 60-120 seconds. Please wait.",
     "success": "✅ Processing complete with **{style}** style!",
     "photo_requirements": "📸 **Photo Requirements**\n\n✅ Full body or upper body visible\n✅ Clear, well-lit image\n✅ Single person in frame\n✅ Good quality photo\n\n**Best Results Tips:**\n• Natural standing pose works best\n• Front-facing preferred\n• Good lighting essential\n• High resolution recommended"
   },
@@ -104,13 +118,15 @@
     "photo_too_small": "❌ Photo resolution too low. Minimum 512x512 pixels required.",
     "no_prompt": "❌ Please send a text prompt first.",
     "invalid_style": "❌ Invalid style selected. Please choose from the available options.",
-    "max_photos_reached": "⚠️ Maximum {max} photos reached. Type 'done' to continue."
+    "max_photos_reached": "⚠️ Maximum {max} photos reached. Type 'done' to continue.",
+    "no_face_detected": "❌ No face detected. Please send a clear photo with visible face."
   },
   "buttons": {
     "back_to_menu": "🔙 Back to Menu",
     "cancel": "❌ Cancel",
     "done": "✅ Done",
-    "retry": "🔄 Try Again"
+    "retry": "🔄 Try Again",
+    "confirm": "✅ Confirm"
   },
   "common": {
     "please_wait": "⏳ Please wait...",
@@ -118,5 +134,85 @@
     "loading": "🔄 Loading...",
     "back": "🔙 Back",
     "choose_mode": "Choose a mode:"
+  },
+  "help": {
+    "title": "🆘 **Need Help?**\n\nHere you will find answers to popular questions and solutions to problems.\n\nSelect a section:",
+    "generation_problems": "❌ Generations Not Working",
+    "payment_problems": "💳 Payment Problems",
+    "tech_support": "💻 Tech Support",
+    "generation_problems_content": "**Having problems with generation? Let's figure it out!**\n\n• **1. Button not working:** If the \"Generate\" button doesn't react, you might be using an outdated version of the menu. Just press /start to update the menu.\n\n• **2. No result:** If the bot writes \"started generation,\" but nothing happens, it means Telegram deleted the original photo from the cache. Please send the photo again and everything will work.\n\nIf the problem persists, contact technical support.",
+    "payment_problems_content": "**Having problems with payment?**\n\n• **1. Payment not credited:**\n  - Wait 3 minutes, sometimes payments are delayed.\n  - When paying with cryptocurrency, the waiting time is up to 10 minutes.\n  - If the payment is not credited, contact technical support.\n\n• **2. Payment page does not open:**\n  - In some regions, it only works with VPN. Turn on VPN and try again.\n\nIf there is another problem - contact technical support.",
+    "tech_support_content": "**Technical Support**\n\nIf you have problems that cannot be solved through the help section, contact technical support.\n\nOur team will help you solve any questions!",
+    "prompt_guide": "💡 **How to Write Good Prompts**",
+    "examples": "📋 **Best Request Examples**",
+    "style_guide": "🎨 **How to Choose Style**",
+    "limitations": "⚠️ **Limitations**",
+    "face_improvement": "👤 **How to Improve Face**",
+    "prohibited": "🚫 **What's Prohibited**",
+    "prompt_guide_content": "A good prompt includes:\n\n1. **Subject** - Who or what\n2. **Action/Pose** - What they're doing\n3. **Location** - Where it happens\n4. **Atmosphere** - Mood\n5. **Details** - Clothing, lighting, colors\n\n✨ Be specific and descriptive!",
+    "style_guide_content": "**Available Styles:**\n\n🎬 **Noir** - Cinematic black and white style\n📸 **Super Realism** - Maximum realistic\n✨ **Anime** - Anime style\n📸 **Realism** - Photorealism\n✨ **Lux** - Luxury style\n🤖 **ChatGPT** - Universal style",
+    "limitations_content": "**Limitations:**\n\n• Maximum photo size: 10 MB\n• Minimum resolution: 512x512\n• Formats: JPG, PNG\n• Maximum 5 face photos\n• Generation may take 30-120 seconds",
+    "face_improvement_content": "**Tips for Better Face Results:**\n\n✅ Clear frontal photos\n✅ Good lighting\n✅ High quality\n✅ Multiple photos (1-5) for better accuracy\n✅ Avoid photos with sunglasses or covered face",
+    "prohibited_content": "**Prohibited:**\n\n❌ Generating illegal content\n❌ Using others' photos without permission\n❌ Spam and abuse\n❌ Copyright violation\n\n⚠️ Bot is for legal use only."
+  },
+  "profile": {
+    "title": "👤 **Profile**",
+    "balance": "💰 **Balance:**",
+    "balance_amount": "{amount} ₽",
+    "balance_zero": "0 ₽",
+    "statistics": "📊 **Statistics:**",
+    "total_generations": "Total generations: {count}",
+    "free_generations": "Free generation: {count}",
+    "nsfw_generations": "NSFW with face: {count}",
+    "clothes_removals": "Clothes removal: {count}",
+    "history": "📜 **History:**",
+    "no_history": "No history",
+    "settings": "⚙️ **Settings:**",
+    "language": "Language: {lang}",
+    "default_quality": "Default quality: {quality}",
+    "limits": "📋 **Limits:**",
+    "no_limits": "No limits set"
+  },
+  "balance": {
+    "title": "💰 **Balance**",
+    "current_balance": "Current balance: {amount} ₽",
+    "topup_title": "💳 **Balance Top-up**",
+    "topup_info": "When topping up from 500 ₽, you will be credited with processing units as a gift 🎁",
+    "topup_warning": "⚠️ SBP QR in the first button (1-click payment)",
+    "topup_amounts": "Choose top-up amount:",
+    "amount_300": "300 ₽",
+    "amount_500": "500 ₽ (+2 🎁)",
+    "amount_1000": "1000 ₽ (+5 🎁)",
+    "amount_2000": "2000 ₽ (+12 🎁)",
+    "amount_3000": "3000 ₽ (+20 🎁)",
+    "amount_5000": "5000 ₽ (+38 🎁)",
+    "payment_processing": "⏳ Processing payment...",
+    "payment_success": "✅ Payment successfully credited!",
+    "payment_failed": "❌ Error processing payment"
+  },
+  "video_animation": {
+    "title": "🎬 **Video Animation**",
+    "description": "Turn your photo into a living video with AI!",
+    "photo_request": "Please send a photo that you want to turn into a video",
+    "photo_guide_link": "📖 Instructions for choosing a photo for animation",
+    "processing": "🎬 Processing video...\n\nThis may take 60-120 seconds.",
+    "success": "✅ Video ready!",
+    "coming_soon": "🚧 \"Video Animation\" feature coming soon!\n\nWe are working on adding this capability."
+  },
+  "create_bot": {
+    "title": "🤖 **Create Your Bot**",
+    "description": "Create an exact copy of our bot and get passive income!",
+    "features": "**Your own bot — the path to financial freedom** ✨\n\nWe provide you with a unique chance — to create your own bot with one click! All technical aspects, including servers and support, we have taken upon ourselves.",
+    "easy_start": "✅ **Easy Start:**\nJust press the button, and your bot is ready to work. No worries, no extra costs.",
+    "income": "💰 **Income you will receive:**\nYour bot is an earning machine; from every transaction conducted through your bot, you will receive 50%. And in addition to income from your bot's clients, receive passive income, expand your referral network.",
+    "referral": "📈 **Referral Program:**\nUse our bot's advanced referral system and earn more even without your participation.",
+    "create_button": "🤖 Create Bot",
+    "coming_soon": "🚧 \"Create Bot\" feature coming soon!"
+  },
+  "result_actions": {
+    "regenerate": "🔄 Regenerate",
+    "improve_quality": "⬆️ Improve Quality",
+    "change_style": "🎨 Change Style",
+    "download": "📤 Download Original"
   }
 }

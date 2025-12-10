@@ -6,9 +6,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import logging
 
-from config import get_settings
-from routers import health, generate
-from utils.json_logging import setup_json_logging
+from backend.config import get_settings
+from backend.routers import health, generate
+from backend.utils.json_logging import setup_json_logging
 
 settings = get_settings()
 

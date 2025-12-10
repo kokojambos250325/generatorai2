@@ -8,8 +8,8 @@ MVP: Fixed parameters, no advanced customization.
 import logging
 from typing import Dict, Any
 
-from schemas.request_clothes import ClothesRemovalRequest
-from clients.gpu_client import GPUClient
+from backend.schemas.request_clothes import ClothesRemovalRequest
+from backend.clients.gpu_client import GPUClient
 
 logger = logging.getLogger(__name__)
 
