@@ -93,7 +93,7 @@ class FreeWorkflowAdapter(WorkflowAdapter):
     """Adapter for Free SDXL text-to-image generation"""
     
     def get_workflow_filename(self) -> str:
-        return "free_workflow_template.json"
+        return "free_generation.json"
     
     def inject_parameters(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """
