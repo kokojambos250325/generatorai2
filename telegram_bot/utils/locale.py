@@ -175,7 +175,7 @@ class LocaleManager:
         logger.warning(f"Ключ '{key}' не указывает на строковое значение")
         return f"[{key}]"
     
-    def get_user_language(self, user_id: int) -> str:
+    def get_user_language(self, user_id: int) -> Optional[str]:
         """
         Получение предпочитаемого языка пользователя.
         
@@ -183,10 +183,10 @@ class LocaleManager:
             user_id: Telegram ID пользователя
         
         Returns:
-            Код языка (например, "en", "ru")
+            Код языка (например, "en", "ru") или None, если язык не выбран
         """
         user_id_str = str(user_id)
-        return self._user_preferences.get(user_id_str, self.DEFAULT_LANGUAGE)
+        return self._user_preferences.get(user_id_str)
     
     def set_user_language(self, user_id: int, lang: str) -> bool:
         """
