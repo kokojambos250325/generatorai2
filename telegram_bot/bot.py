@@ -59,6 +59,32 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await send_error_message(update, context, error)
 
 
+async def terms_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /terms command"""
+    locale = context.bot_data.get('locale_manager')
+    user_id = update.effective_user.id
+    lang = locale.get_user_language(user_id) if locale else "en"
+    
+    await update.message.reply_text(
+        "📄 **Условия оферты**\n\n"
+        "1. Используя бота, вы соглашаетесь с правилами обработки данных.\n"
+        "2. Бот предоставляет услуги генерации изображений \"как есть\".\n"
+        "3. Пользователь несет ответственность за загружаемый контент.\n\n"
+        "Полный текст оферты доступен на сайте (ссылка).",
+        parse_mode="Markdown"
+    )
+
+async def post_init(application: Application):
+    """Post initialization hook to set bot commands"""
+    commands = [
+        ("start", "Главное меню/Перезапуск ♻️"),
+        ("balance", "Баланс 💰"),
+        ("buy", "Купить обработки 🛒"),
+        ("help", "Помощь ❓"),
+        ("terms", "Условия оферты 📄")
+    ]
+    await application.bot.set_my_commands(commands)
+
 def main():
     """Start the bot"""
     logger.info("Starting Telegram Bot...")
@@ -73,6 +99,7 @@ def main():
     application = (
         Application.builder()
         .token(settings.telegram_bot_token)
+        .post_init(post_init)
         .build()
     )
     
@@ -83,6 +110,10 @@ def main():
     
     # Start command
     application.add_handler(CommandHandler("start", start.start_command))
+    application.add_handler(CommandHandler("balance", balance.show_balance))
+    application.add_handler(CommandHandler("buy", balance.show_topup))
+    application.add_handler(CommandHandler("help", help.show_help_menu))
+    application.add_handler(CommandHandler("terms", terms_command))
     
     # Help callbacks
     application.add_handler(CallbackQueryHandler(
