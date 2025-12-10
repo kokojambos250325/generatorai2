@@ -59,26 +59,19 @@ class ClothesRemovalService:
         
         # Build generation parameters
         params = {
-            "target_image": request.target_image,
-            "model": style_config["model"],
-            "strength": style_config["strength"],
-            "controlnet_strength": request.controlnet_strength,
-            "inpaint_denoise": request.inpaint_denoise,
-            "segmentation_threshold": request.segmentation_threshold,
-            "negative_prompt": "clothing, dressed, covered, clothes, shirt, pants"
+            "image": request.target_image,
+            "style": request.style,
+            "seed": request.seed if request.seed is not None and request.seed != -1 else None,
+            # Extra params used by GPU worker logic if needed, 
+            # but schema only strictly defines some fields. 
+            # We might need to check if GPU server accepts extra fields.
+            # Based on schema it doesn't allow extra.
+            # But let's assume Pydantic extra="ignore" might be needed there too if we send extras.
         }
-        
-        # Add optional parameters
-        if request.seed is not None and request.seed != -1:
-            params["seed"] = request.seed
-        if request.steps:
-            params["steps"] = request.steps
-        
-        logger.debug(f"Clothes removal params: model={params['model']}, controlnet={params['controlnet_strength']}")
         
         # Call GPU service
         result = await self.gpu_client.generate(
-            workflow="clothes_removal",
+            workflow="clothes",
             params=params
         )
         

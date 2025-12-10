@@ -48,8 +48,8 @@ class GPUClient:
         Submit generation request to GPU service.
         
         Args:
-            workflow: Workflow name (free_generation, clothes_removal)
-            params: Generation parameters
+            workflow: Workflow name (maps to 'mode' in GPU request)
+            params: Generation parameters (unpacked to request body)
         
         Returns:
             dict: Generation result with image data
@@ -58,14 +58,16 @@ class GPUClient:
             Exception: If generation fails
         """
         try:
+            # Construct payload matching GPUGenerationRequest schema
+            payload = {
+                "mode": workflow,
+                **{k: v for k, v in params.items() if v is not None}
+            }
+            
             async with httpx.AsyncClient(timeout=self.timeout) as client:
                 response = await client.post(
                     f"{self.base_url}/generate",
-                    json={
-                        "workflow": workflow,
-                        "params": params,
-                        "request_id": self.request_id  # Include request_id for tracing
-                    }
+                    json=payload
                 )
                 
                 response.raise_for_status()
