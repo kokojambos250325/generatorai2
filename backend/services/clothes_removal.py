@@ -71,7 +71,7 @@ class ClothesRemovalService:
         
         # Call GPU service
         result = await self.gpu_client.generate(
-            workflow="clothes",
+            workflow="clothes_removal",
             params=params
         )
         
