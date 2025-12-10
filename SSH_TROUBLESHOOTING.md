@@ -3,8 +3,14 @@
 ## Проблема
 VS Code Remote SSH не может подключиться к серверу:
 - `Connection closed by 38.147.83.26 port 25206`
+- `kex_exchange_identification: Connection closed by remote host`
 - `Попытка записи в несуществующий канал`
 - `Failed to parse remote port from server output`
+
+**Диагноз:** Сервер закрывает соединение во время обмена ключами SSH. Это может быть из-за:
+1. Проблем с авторизацией на сервере
+2. Ограничений RunPod на SSH соединения
+3. Проблем с SSH сервером на RunPod
 
 ## Решения
 
@@ -125,7 +131,56 @@ journalctl -u ssh -n 50
 - Убедитесь, что SSH порт 25206 открыт
 - Проверьте, не включены ли ограничения на SSH соединения
 
-### 10. Временное решение
+### 10. Решение проблемы "Connection closed by remote host"
+
+Если вы видите ошибку `kex_exchange_identification: Connection closed by remote host`, это означает, что сервер закрывает соединение до завершения авторизации.
+
+**Решение A: Проверка SSH ключа на сервере**
+
+```bash
+# Подключитесь через RunPod Web Terminal или другой способ
+# Проверьте authorized_keys
+cat ~/.ssh/authorized_keys
+
+# Убедитесь, что ваш публичный ключ там есть
+# Если нет, добавьте:
+echo "ваш_публичный_ключ" >> ~/.ssh/authorized_keys
+chmod 600 ~/.ssh/authorized_keys
+chmod 700 ~/.ssh
+```
+
+**Решение B: Использование пароля вместо ключа (временно)**
+
+Если ключ не работает, попробуйте подключиться с паролем:
+
+```ssh-config
+Host runpod
+    HostName 38.147.83.26
+    Port 25206
+    User root
+    PreferredAuthentications password
+    PubkeyAuthentication no
+```
+
+**Решение C: Проверка SSH сервера на RunPod**
+
+```bash
+# На сервере проверьте SSH сервер
+systemctl status sshd
+journalctl -u sshd -n 50
+
+# Проверьте конфигурацию SSH
+cat /etc/ssh/sshd_config | grep -E "PubkeyAuthentication|AuthorizedKeysFile|PermitRootLogin"
+```
+
+**Решение D: Использование RunPod Web Terminal**
+
+Если SSH не работает, используйте встроенный Web Terminal RunPod:
+1. Откройте панель управления RunPod
+2. Найдите "Web Terminal"
+3. Используйте его для доступа к серверу
+
+### 11. Временное решение
 
 Пока проблема не решена, используйте обычный SSH терминал:
 
@@ -133,6 +188,11 @@ journalctl -u ssh -n 50
 # Создайте ярлык для быстрого подключения
 ssh -i C:\Users\KIT\.ssh\id_ed25519 -p 25206 root@38.147.83.26
 ```
+
+**Или используйте альтернативные инструменты:**
+- **PuTTY** - классический SSH клиент для Windows
+- **MobaXterm** - полноценный терминал с встроенным редактором
+- **WinSCP** - для работы с файлами
 
 ## Диагностика
 
