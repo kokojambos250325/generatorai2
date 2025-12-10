@@ -13,6 +13,12 @@ from backend.config import STYLE_CONFIG
 logger = logging.getLogger(__name__)
 
 # Quality profiles mapping
+# Pony Diffusion XL recommended settings:
+# - Steps: 30+ (minimum)
+# - CFG: 5 (default)
+# - Resolution: 896x1152 or 832x1216
+# - Sampler: DPM++ 2M Karras / DPM++ SDE Karras / Euler a
+# - Clip Skip: 2
 QUALITY_PROFILES = {
     "fast": {
         "steps": 18,
@@ -20,40 +26,45 @@ QUALITY_PROFILES = {
         "width": 704,
         "height": 1024,
         "sampler": "euler",
-        "scheduler": "normal"
+        "scheduler": "normal",
+        "clip_skip": 1
     },
     "balanced": {
-        "steps": 26,
-        "cfg": 7.5,
+        "steps": 30,  # Updated: minimum 30 for Pony
+        "cfg": 5,  # Updated: default 5 for Pony
         "width": 832,
         "height": 1216,
-        "sampler": "euler",
-        "scheduler": "normal"
+        "sampler": "dpmpp_2m",  # Updated: DPM++ 2M Karras
+        "scheduler": "karras",  # Updated: Karras scheduler
+        "clip_skip": 2  # Added: Clip Skip 2 for Pony
     },
     "high_quality": {
-        "steps": 32,
-        "cfg": 8.0,
+        "steps": 35,  # Updated: 30+ for high quality
+        "cfg": 5,  # Updated: default 5 for Pony
         "width": 896,
-        "height": 1344,
-        "sampler": "dpmpp_2m",
-        "scheduler": "karras"
+        "height": 1152,  # Updated: 896x1152 per Pony recommendations
+        "sampler": "dpmpp_2m_sde",  # Updated: DPM++ SDE Karras (fallback to dpmpp_2m if not available)
+        "scheduler": "karras",
+        "clip_skip": 2  # Added: Clip Skip 2 for Pony
     },
     # Aliases for backward compatibility
     "pony_balanced": {
-        "steps": 26,
-        "cfg": 7.5,
+        "steps": 30,
+        "cfg": 5,
         "width": 832,
         "height": 1216,
-        "sampler": "euler",
-        "scheduler": "normal"
+        "sampler": "dpmpp_2m",
+        "scheduler": "karras",
+        "clip_skip": 2
     },
     "pony_high_quality": {
-        "steps": 32,
-        "cfg": 8.0,
+        "steps": 35,
+        "cfg": 5,
         "width": 896,
-        "height": 1344,
-        "sampler": "dpmpp_2m",
-        "scheduler": "karras"
+        "height": 1152,
+        "sampler": "dpmpp_2m_sde",
+        "scheduler": "karras",
+        "clip_skip": 2
     }
 }
 
@@ -128,9 +139,15 @@ class ParameterResolver:
                 final_params["height"] = extra_params["height"]
             if extra_params.get("denoise"):
                 final_params["denoise"] = extra_params["denoise"]
+            if extra_params.get("clip_skip"):
+                final_params["clip_skip"] = extra_params["clip_skip"]
             if extra_params.get("seed") is not None:
                 # Handle seed separately (can be -1 for random)
                 pass  # Already handled below
+        
+        # Ensure clip_skip is set (default 2 for Pony)
+        if "clip_skip" not in final_params:
+            final_params["clip_skip"] = quality_params.get("clip_skip", 2)
         
         # Step 4: Add prompt with style prefix
         enhanced_prompt = style_config["prompt_prefix"] + prompt

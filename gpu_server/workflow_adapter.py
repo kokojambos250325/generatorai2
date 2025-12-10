@@ -125,10 +125,26 @@ class FreeWorkflowAdapter(WorkflowAdapter):
             self.inject_node_value("3", "seed", params["seed"])
         if "steps" in params:
             self.inject_node_value("3", "steps", params["steps"])
-        if "cfg_scale" in params:
+        if "cfg" in params:
+            self.inject_node_value("3", "cfg", params["cfg"])
+        elif "cfg_scale" in params:
             self.inject_node_value("3", "cfg", params["cfg_scale"])
-        if "sampler_name" in params:
-            self.inject_node_value("3", "sampler_name", params["sampler_name"])
+        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        sampler_name = params.get("sampler", "euler")
+        scheduler = params.get("scheduler", "normal")
+        if sampler_name == "dpmpp_2m" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_karras"
+        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_sde_karras"
+        elif sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        self.inject_node_value("3", "sampler_name", sampler_name)
+        if "scheduler" in params:
+            self.inject_node_value("3", "scheduler", params["scheduler"])
+        
+        # Inject clip_skip (usually in CheckpointLoader node 4)
+        if "clip_skip" in params:
+            self.inject_node_value("4", "clip_skip", params["clip_skip"])
         
         # Inject latent image dimensions
         if "width" in params:
@@ -423,8 +439,28 @@ class FreeGenerationFaceAdapter(WorkflowAdapter):
             self.inject_node_value("3", "steps", params["steps"])
         if "cfg" in params:
             self.inject_node_value("3", "cfg", params["cfg"])
-        if "sampler_name" in params:
-            self.inject_node_value("3", "sampler_name", params["sampler_name"])
+        elif "cfg_scale" in params:
+            self.inject_node_value("3", "cfg", params["cfg_scale"])
+        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        sampler_name = params.get("sampler", "euler")
+        scheduler = params.get("scheduler", "normal")
+        if sampler_name == "dpmpp_2m" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_karras"
+        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_sde_karras"
+        elif sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        self.inject_node_value("3", "sampler_name", sampler_name)
+        if "scheduler" in params:
+            self.inject_node_value("3", "scheduler", params["scheduler"])
+        
+        # Inject clip_skip (usually in CheckpointLoader node 4)
+        if "clip_skip" in params:
+            try:
+                self.inject_node_value("4", "clip_skip", params["clip_skip"])
+            except ValueError:
+                # CheckpointLoaderSimple doesn't support clip_skip, skip it
+                logger.debug("clip_skip not supported in this workflow")
         
         # Inject latent dimensions
         if "width" in params:
@@ -500,6 +536,28 @@ class ClothesRemovalEnhancedAdapter(WorkflowAdapter):
             self.inject_node_value("3", "steps", params["steps"])
         if "cfg" in params:
             self.inject_node_value("3", "cfg", params["cfg"])
+        elif "cfg_scale" in params:
+            self.inject_node_value("3", "cfg", params["cfg_scale"])
+        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        sampler_name = params.get("sampler", "euler")
+        scheduler = params.get("scheduler", "normal")
+        if sampler_name == "dpmpp_2m" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_karras"
+        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_sde_karras"
+        elif sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        self.inject_node_value("3", "sampler_name", sampler_name)
+        if "scheduler" in params:
+            self.inject_node_value("3", "scheduler", params["scheduler"])
+        
+        # Inject clip_skip (usually in CheckpointLoader node 4)
+        if "clip_skip" in params:
+            try:
+                self.inject_node_value("4", "clip_skip", params["clip_skip"])
+            except ValueError:
+                # CheckpointLoaderSimple doesn't support clip_skip, skip it
+                logger.debug("clip_skip not supported in this workflow")
         
         return self.workflow
 
@@ -561,6 +619,28 @@ class NSFWFaceAdapter(WorkflowAdapter):
             self.inject_node_value("3", "steps", params["steps"])
         if "cfg" in params:
             self.inject_node_value("3", "cfg", params["cfg"])
+        elif "cfg_scale" in params:
+            self.inject_node_value("3", "cfg", params["cfg_scale"])
+        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        sampler_name = params.get("sampler", "euler")
+        scheduler = params.get("scheduler", "normal")
+        if sampler_name == "dpmpp_2m" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_karras"
+        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
+            sampler_name = "dpmpp_2m_sde_karras"
+        elif sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        self.inject_node_value("3", "sampler_name", sampler_name)
+        if "scheduler" in params:
+            self.inject_node_value("3", "scheduler", params["scheduler"])
+        
+        # Inject clip_skip (usually in CheckpointLoader node 4)
+        if "clip_skip" in params:
+            try:
+                self.inject_node_value("4", "clip_skip", params["clip_skip"])
+            except ValueError:
+                # CheckpointLoaderSimple doesn't support clip_skip, skip it
+                logger.debug("clip_skip not supported in this workflow")
         
         # Inject dimensions
         if "width" in params:
