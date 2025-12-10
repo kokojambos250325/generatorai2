@@ -398,8 +398,13 @@ class FreeGenerationFaceAdapter(WorkflowAdapter):
         negative_prompt = params.get("negative_prompt", "low quality, blurry")
         self.inject_node_value("7", "text", negative_prompt)
         
-        # Inject face reference image
+        # Inject face reference image (can be single image or first from array)
         face_image = params.get("face_image")
+        if not face_image:
+            # Try to get from face_images array
+            face_images = params.get("face_images", [])
+            if face_images and len(face_images) > 0:
+                face_image = face_images[0] if isinstance(face_images, list) else face_images
         if face_image:
             self.inject_node_value("20", "image", face_image)
         
