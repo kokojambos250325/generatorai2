@@ -55,7 +55,7 @@ class FreeGenerationService:
         
         # Call GPU service with resolved parameters
         result = await self.gpu_client.generate(
-            workflow="free_generation",
+            workflow="free",
             params=params
         )
         
