@@ -14,14 +14,28 @@
    - Скачайте файл **"Full Model fp32 (12.92 GB)"**
 
 2. **Загрузите на сервер:**
-   ```bash
-   # Через SCP (с локальной машины)
-   scp -i ~/.ssh/id_ed25519 -P 25206 cyberrealisticPony_v15.safetensors root@38.147.83.26:/workspace/ComfyUI/models/checkpoints/
    
-   # Или через wget на сервере (если есть прямая ссылка)
-   cd /workspace/ComfyUI/models/checkpoints/
-   wget <прямая_ссылка_на_файл> -O cyberrealisticPony_v14.safetensors
+   **Вариант A: Через SCP (рекомендуется)**
+   ```bash
+   # Скачайте файл локально, затем загрузите на сервер
+   scp -i ~/.ssh/id_ed25519 -P 25206 <локальный_файл>.safetensors root@38.147.83.26:/workspace/ComfyUI/models/checkpoints/cyberrealisticPony_v14.safetensors
    ```
+   
+   **Вариант B: Через wget на сервере (требует токен Civitai)**
+   ```bash
+   # На сервере, получите токен с https://civitai.com/user/account
+   export CIVITAI_TOKEN="ваш_токен"
+   cd /workspace/ComfyUI/models/checkpoints/
+   
+   # Скачайте полную версию (замените MODEL_VERSION_ID на ID версии с полной моделью)
+   curl -H "Authorization: Bearer $CIVITAI_TOKEN" \
+        -L "https://civitai.com/api/download/models/2469412" \
+        -o cyberrealisticPony_v14.safetensors
+   ```
+   
+   **Вариант C: Через браузер и загрузку**
+   - Скачайте файл в браузере
+   - Используйте WinSCP, FileZilla или другой SFTP клиент для загрузки
 
 3. **Замените старый файл:**
    ```bash
