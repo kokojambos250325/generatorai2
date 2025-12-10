@@ -33,7 +33,8 @@ echo "   - Запуск Telegram Bot..."
 export PYTHONPATH=/workspace/ai-generator
 # Подгружаем .env если есть
 if [ -f .env ]; then export $(cat .env | xargs); fi
-nohup python3 telegram_bot/bot.py > /workspace/logs/telegram_bot.log 2>&1 &
+cd /workspace/ai-generator
+nohup python telegram_bot/bot.py > /workspace/logs/telegram_bot.log 2>&1 &
 
 echo "=== ГОТОВО! СЕРВИСЫ ПЕРЕЗАПУЩЕНЫ ==="
 echo "Логи: /workspace/logs/"
