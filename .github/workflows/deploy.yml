@@ -32,11 +32,11 @@ jobs:
           echo "🚀 Начинаем деплой на RunPod..."
           
           # Проверка подключения
-          ssh -i ~/.ssh/runpod_key -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "echo 'SSH connection OK'"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o ConnectTimeout=10 -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "echo 'SSH connection OK'"
           
           # Клонирование или обновление репозитория
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace && if [ -d ai-generator ]; then cd ai-generator && git fetch origin && git reset --hard origin/main; else git clone https://github.com/${REPO}.git ai-generator; fi"
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && git log -1 --oneline"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace && if [ -d ai-generator ]; then cd ai-generator && git fetch origin && git reset --hard origin/main; else git clone https://github.com/${REPO}.git ai-generator; fi"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && git log -1 --oneline"
 
       - name: Install dependencies
         env:
@@ -44,7 +44,7 @@ jobs:
           SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
         run: |
           echo "📚 Установка зависимостей..."
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && source /workspace/ComfyUI/venv/bin/activate && pip install -r requirements.txt --quiet && echo 'Dependencies installed'"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator && source /workspace/ComfyUI/venv/bin/activate && pip install -r requirements.txt --quiet && echo 'Dependencies installed'"
 
       - name: Restart services
         env:
@@ -52,8 +52,8 @@ jobs:
           SSH_USER: ${{ secrets.RUNPOD_SSH_USER }}
         run: |
           echo "🔄 Перезапуск сервисов..."
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "pkill -f 'uvicorn.*main:app' || true; pkill -f 'python.*telegram' || true; sleep 2"
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator/gpu_server/server && source /workspace/ComfyUI/venv/bin/activate && nohup python -m uvicorn main:app --host 0.0.0.0 --port 3000 > /tmp/fastapi.log 2>&1 &"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "pkill -f 'uvicorn.*main:app' || true; pkill -f 'python.*telegram' || true; sleep 2"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "cd /workspace/ai-generator/gpu_server/server && source /workspace/ComfyUI/venv/bin/activate && nohup python -m uvicorn main:app --host 0.0.0.0 --port 3000 > /tmp/fastapi.log 2>&1 &"
           echo "Waiting for services to start..."
           sleep 10
 
@@ -64,7 +64,7 @@ jobs:
           RUNPOD_POD_URL: ${{ secrets.RUNPOD_POD_URL }}
         run: |
           echo "🏥 Проверка работоспособности..."
-          ssh -i ~/.ssh/runpod_key -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "ps aux | grep -E '(uvicorn|ComfyUI)' | grep -v grep || echo 'No processes found'"
+          ssh -i ~/.ssh/runpod_key -p "${SSH_PORT}" -o StrictHostKeyChecking=no ${SSH_USER}@${SSH_HOST} "ps aux | grep -E '(uvicorn|ComfyUI)' | grep -v grep || echo 'No processes found'"
           
           echo "Checking FastAPI via proxy..."
           for i in 1 2 3 4 5; do
