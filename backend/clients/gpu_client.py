@@ -7,6 +7,8 @@ Handles all requests to the ComfyUI-based GPU service.
 
 import httpx
 import logging
+import asyncio
+import time
 from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
@@ -71,15 +73,48 @@ class GPUClient:
                 )
                 
                 response.raise_for_status()
-                result = response.json()
+                submit_result = response.json()
+                task_id = submit_result.get("task_id")
                 
-                # Check if GPU server returned an error status
-                if result.get("status") == "failed":
-                    error_msg = result.get("error", "Unknown GPU service error")
-                    logger.error(f"GPU service returned failed status: {error_msg} (request_id={self.request_id})")
-                    raise Exception(f"GPU generation failed: {error_msg}")
+                if not task_id:
+                    raise Exception("GPU service did not return task_id")
                 
-                return result
+                logger.info(f"Task submitted to GPU service: {task_id} (request_id={self.request_id})")
+                
+                # Poll for completion
+                start_time = time.time()
+                while (time.time() - start_time) < self.timeout:
+                    try:
+                        status_response = await client.get(f"{self.base_url}/task/{task_id}")
+                        status_response.raise_for_status()
+                        status_data = status_response.json()
+                        status = status_data.get("status")
+                        
+                        if status == "completed":
+                            # Fetch result
+                            result_response = await client.get(f"{self.base_url}/result/{task_id}")
+                            result_response.raise_for_status()
+                            result_data = result_response.json()
+                            
+                            # Normalize result for services
+                            return {
+                                "status": "done",
+                                "image": result_data.get("result_image"),
+                                "task_id": task_id
+                            }
+                            
+                        elif status == "failed":
+                            error = status_data.get("error", "Unknown error")
+                            raise Exception(f"Task failed: {error}")
+                            
+                        # Wait before next poll
+                        await asyncio.sleep(1)
+                        
+                    except httpx.RequestError as e:
+                        logger.warning(f"Polling error for task {task_id}: {e}")
+                        await asyncio.sleep(1)
+                
+                raise Exception(f"Generation timeout after {self.timeout} seconds")
         
         except httpx.TimeoutException:
             logger.error(f"GPU service timeout after {self.timeout}s (request_id={self.request_id})")
