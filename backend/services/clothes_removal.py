@@ -62,11 +62,10 @@ class ClothesRemovalService:
             "image": request.target_image,
             "style": request.style,
             "seed": request.seed if request.seed is not None and request.seed != -1 else None,
-            # Extra params used by GPU worker logic if needed, 
-            # but schema only strictly defines some fields. 
-            # We might need to check if GPU server accepts extra fields.
-            # Based on schema it doesn't allow extra.
-            # But let's assume Pydantic extra="ignore" might be needed there too if we send extras.
+            "controlnet_strength": request.controlnet_strength,
+            "inpaint_denoise": request.inpaint_denoise,
+            "segmentation_threshold": request.segmentation_threshold,
+            "steps": request.steps,
         }
         
         # Call GPU service

@@ -129,6 +129,11 @@ class GPUWorker:
             params["source_image"] = request.source_image
         if hasattr(request, "target_image"):
             params["target_image"] = request.target_image
+        if hasattr(request, "image"):
+            # For clothes_removal mode, "image" maps to "target_image" in adapter
+            params["image"] = request.image
+            if mode == "clothes_removal":
+                params["target_image"] = request.image  # Also set for adapter compatibility
         if hasattr(request, "face_image"):
             params["face_image"] = request.face_image
         

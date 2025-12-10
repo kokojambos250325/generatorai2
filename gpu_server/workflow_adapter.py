@@ -455,8 +455,8 @@ class ClothesRemovalEnhancedAdapter(WorkflowAdapter):
         if self.workflow is None:
             self.load_workflow()
         
-        # Inject target image
-        target_image = params.get("target_image")
+        # Inject target image (can be "image" or "target_image" from params)
+        target_image = params.get("target_image") or params.get("image")
         if target_image:
             self.inject_node_value("1", "image", target_image)
         
