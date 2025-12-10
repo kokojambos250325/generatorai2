@@ -76,7 +76,8 @@ async def show_main_menu_message(update: Update, context: ContextTypes.DEFAULT_T
     await update.message.reply_text(
         welcome_text,
         reply_markup=reply_markup,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        disable_web_page_preview=True
     )
 
 
@@ -208,7 +209,8 @@ async def show_main_menu_message_after_callback(update: Update, context: Context
     await query.message.reply_text(
         welcome_text,
         reply_markup=reply_markup,
-        parse_mode="Markdown"
+        parse_mode="Markdown",
+        disable_web_page_preview=True
     )
 
 

@@ -127,36 +127,71 @@ def main():
         pattern=r"^show_profile$"
     ))
     
-    # NSFW Face handlers - must be before general text handler
-    async def nsfw_photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'nsfw_face':
+    # Combined Photo Handler
+    async def global_photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        mode = context.user_data.get('mode')
+        logger.info(f"Global photo handler: mode={mode}")
+        
+        if mode == 'nsfw_face':
             from telegram_bot.states import NSFWFaceState
             current_state = context.user_data.get('state')
-            # Only handle photos when waiting for faces
             if current_state == NSFWFaceState.WAITING_FACES.value:
                 await nsfw_face.handle_face_photo(update, context)
-    
-    async def nsfw_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'nsfw_face':
-            # Check state
+        
+        elif mode == 'free_generation':
+            from telegram_bot.states import FreeGenerationState
+            current_state = context.user_data.get('state')
+            if current_state == FreeGenerationState.WAITING_FACE.value:
+                await free.handle_face_photo(update, context)
+        
+        elif mode == 'clothes_removal':
+            from telegram_bot.states import ClothesRemovalState
+            current_state = context.user_data.get('state')
+            if current_state == ClothesRemovalState.WAITING_PHOTO.value:
+                await clothes.handle_photo(update, context)
+        
+        elif mode == 'face_swap':
+            from telegram_bot.handlers import face_swap
+            current_state = context.user_data.get('state')
+            if current_state == face_swap.WAITING_FACE_SWAP_SOURCE:
+                await face_swap.process_face_swap_source(update, context)
+            elif current_state == face_swap.WAITING_FACE_SWAP_TARGET:
+                await face_swap.process_face_swap_target(update, context)
+
+    # Combined Text Handler
+    async def global_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+        mode = context.user_data.get('mode')
+        text = update.message.text.lower().strip()
+        logger.info(f"Global text handler: mode={mode}, text={text}")
+        
+        if mode == 'nsfw_face':
             from telegram_bot.states import NSFWFaceState
             current_state = context.user_data.get('state')
-            text = update.message.text.lower().strip()
-            
             if current_state == NSFWFaceState.WAITING_FACES.value:
                 if text == 'готово' or text == 'done':
                     await nsfw_face.handle_done_command(update, context)
             elif current_state == NSFWFaceState.WAITING_SCENE.value:
                 await nsfw_face.handle_scene_prompt(update, context)
-    
+        
+        elif mode == 'free_generation':
+            from telegram_bot.states import FreeGenerationState
+            current_state = context.user_data.get('state')
+            if current_state == FreeGenerationState.WAITING_FACE.value:
+                if text == 'готово' or text == 'done':
+                    await free.handle_face_done(update, context)
+            elif current_state == FreeGenerationState.WAITING_PROMPT.value:
+                await free.handle_prompt(update, context)
+
     application.add_handler(MessageHandler(
         filters.PHOTO,
-        nsfw_photo_handler
+        global_photo_handler
     ))
+
     application.add_handler(MessageHandler(
         filters.TEXT & ~filters.COMMAND,
-        nsfw_text_handler
+        global_text_handler
     ))
+    
     # NSFW templates and guide
     application.add_handler(CallbackQueryHandler(
         nsfw_face.show_templates,
@@ -172,37 +207,8 @@ def main():
         pattern=r"^nsfw_style_(realism|lux|anime)$"
     ))
     
-    # Free generation handlers
-    async def free_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'free_generation':
-            from telegram_bot.states import FreeGenerationState
-            current_state = context.user_data.get('state')
-            text = update.message.text.lower().strip()
-            
-            # Check if waiting for face photos (handle 'done' command)
-            if current_state == FreeGenerationState.WAITING_FACE.value:
-                if text == 'готово' or text == 'done':
-                    await free.handle_face_done(update, context)
-            # Otherwise handle as prompt
-            elif current_state == FreeGenerationState.WAITING_PROMPT.value:
-                await free.handle_prompt(update, context)
-    
-    async def free_photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'free_generation':
-            from telegram_bot.states import FreeGenerationState
-            current_state = context.user_data.get('state')
-            # Only handle photos when waiting for face photos
-            if current_state == FreeGenerationState.WAITING_FACE.value:
-                await free.handle_face_photo(update, context)
-    
-    application.add_handler(MessageHandler(
-        filters.TEXT & ~filters.COMMAND,
-        free_text_handler
-    ))
-    application.add_handler(MessageHandler(
-        filters.PHOTO,
-        free_photo_handler
-    ))
+    # Free generation handlers - REMOVED (Merged into global handlers)
+    # See global_text_handler and global_photo_handler above
     
     # Add callback handler for face choice (yes/no/done)
     application.add_handler(CallbackQueryHandler(
@@ -241,33 +247,12 @@ def main():
         pattern=r"^show_prompt_guide$"
     ))
     
-    # Clothes removal handlers - PHOTO messages
-    async def clothes_photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'clothes_removal':
-            from telegram_bot.states import ClothesRemovalState
-            current_state = context.user_data.get('state')
-            if current_state == ClothesRemovalState.WAITING_PHOTO.value:
-                await clothes.handle_photo(update, context)
+    # Clothes removal handlers - REMOVED (Merged into global handlers)
+    # See global_photo_handler
     
-    # Face swap handlers - PHOTO messages
-    async def face_swap_photo_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-        if context.user_data.get('mode') == 'face_swap':
-            from telegram_bot.handlers import face_swap
-            current_state = context.user_data.get('state')
-            if current_state == face_swap.WAITING_FACE_SWAP_SOURCE:
-                await face_swap.process_face_swap_source(update, context)
-            elif current_state == face_swap.WAITING_FACE_SWAP_TARGET:
-                await face_swap.process_face_swap_target(update, context)
-    
-    application.add_handler(MessageHandler(
-        filters.PHOTO,
-        clothes_photo_handler
-    ))
-    application.add_handler(MessageHandler(
-        filters.PHOTO,
-        face_swap_photo_handler
-    ))
-    
+    # Face swap handlers - REMOVED (Merged into global handlers)
+    # See global_photo_handler
+
     # Add callback handler for confirmation in clothes mode
     application.add_handler(CallbackQueryHandler(
         clothes.handle_confirmation,
