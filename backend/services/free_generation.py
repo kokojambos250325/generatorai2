@@ -8,9 +8,9 @@ Uses parameter resolver for unified quality profiles and style configuration.
 import logging
 from typing import Dict, Any
 
-from schemas.request_free import FreeGenerationRequest
-from clients.gpu_client import GPUClient
-from services.param_resolver import ParameterResolver
+from backend.schemas.request_free import FreeGenerationRequest
+from backend.clients.gpu_client import GPUClient
+from backend.services.param_resolver import ParameterResolver
 
 logger = logging.getLogger(__name__)
 
@@ -60,7 +60,11 @@ class FreeGenerationService:
         )
         
         # Extract and return base64 image
-        if "image" not in result:
+        if result.get("status") != "done":
+            error_msg = result.get("error", "Unknown error from GPU service")
+            raise Exception(f"GPU generation failed: {error_msg}")
+        
+        if "image" not in result or not result["image"]:
             raise Exception("GPU service did not return image data")
         
         return result["image"]

@@ -69,7 +69,15 @@ class GPUClient:
                 )
                 
                 response.raise_for_status()
-                return response.json()
+                result = response.json()
+                
+                # Check if GPU server returned an error status
+                if result.get("status") == "failed":
+                    error_msg = result.get("error", "Unknown GPU service error")
+                    logger.error(f"GPU service returned failed status: {error_msg} (request_id={self.request_id})")
+                    raise Exception(f"GPU generation failed: {error_msg}")
+                
+                return result
         
         except httpx.TimeoutException:
             logger.error(f"GPU service timeout after {self.timeout}s (request_id={self.request_id})")
