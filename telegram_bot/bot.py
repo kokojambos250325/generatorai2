@@ -96,7 +96,7 @@ def main():
     
     application.add_handler(CallbackQueryHandler(
         free_style_callback,
-        pattern=r"^style_(realism|lux|anime|chatgpt)$"
+        pattern=r"^style_(realism|lux|anime|chatgpt|noir|super_realism)$"
     ))
     
     # Add callback handler for prompt guide
