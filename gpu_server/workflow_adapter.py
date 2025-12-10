@@ -129,15 +129,14 @@ class FreeWorkflowAdapter(WorkflowAdapter):
             self.inject_node_value("3", "cfg", params["cfg"])
         elif "cfg_scale" in params:
             self.inject_node_value("3", "cfg", params["cfg_scale"])
-        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        # Handle sampler: ComfyUI uses separate sampler_name and scheduler
         sampler_name = params.get("sampler", "euler")
         scheduler = params.get("scheduler", "normal")
-        if sampler_name == "dpmpp_2m" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_karras"
-        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_sde_karras"
-        elif sampler_name == "euler" and scheduler == "normal":
-            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        # For Pony: DPM++ 2M Karras = dpmpp_2m + karras scheduler (separate params)
+        # Euler a = euler_ancestral (ComfyUI doesn't support "euler_a")
+        if sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_ancestral"  # Use euler_ancestral (ComfyUI doesn't support euler_a)
+        # dpmpp_2m and dpmpp_2m_sde are valid ComfyUI sampler names
         self.inject_node_value("3", "sampler_name", sampler_name)
         if "scheduler" in params:
             self.inject_node_value("3", "scheduler", params["scheduler"])
@@ -441,15 +440,14 @@ class FreeGenerationFaceAdapter(WorkflowAdapter):
             self.inject_node_value("3", "cfg", params["cfg"])
         elif "cfg_scale" in params:
             self.inject_node_value("3", "cfg", params["cfg_scale"])
-        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        # Handle sampler: ComfyUI uses separate sampler_name and scheduler
         sampler_name = params.get("sampler", "euler")
         scheduler = params.get("scheduler", "normal")
-        if sampler_name == "dpmpp_2m" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_karras"
-        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_sde_karras"
-        elif sampler_name == "euler" and scheduler == "normal":
-            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        # For Pony: DPM++ 2M Karras = dpmpp_2m + karras scheduler (separate params)
+        # Euler a = euler_ancestral (ComfyUI doesn't support "euler_a")
+        if sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_ancestral"  # Use euler_ancestral (ComfyUI doesn't support euler_a)
+        # dpmpp_2m and dpmpp_2m_sde are valid ComfyUI sampler names
         self.inject_node_value("3", "sampler_name", sampler_name)
         if "scheduler" in params:
             self.inject_node_value("3", "scheduler", params["scheduler"])
@@ -538,15 +536,14 @@ class ClothesRemovalEnhancedAdapter(WorkflowAdapter):
             self.inject_node_value("3", "cfg", params["cfg"])
         elif "cfg_scale" in params:
             self.inject_node_value("3", "cfg", params["cfg_scale"])
-        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        # Handle sampler: ComfyUI uses separate sampler_name and scheduler
         sampler_name = params.get("sampler", "euler")
         scheduler = params.get("scheduler", "normal")
-        if sampler_name == "dpmpp_2m" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_karras"
-        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_sde_karras"
-        elif sampler_name == "euler" and scheduler == "normal":
-            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        # For Pony: DPM++ 2M Karras = dpmpp_2m + karras scheduler (separate params)
+        # Euler a = euler_ancestral (ComfyUI doesn't support "euler_a")
+        if sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_ancestral"  # Use euler_ancestral (ComfyUI doesn't support euler_a)
+        # dpmpp_2m and dpmpp_2m_sde are valid ComfyUI sampler names
         self.inject_node_value("3", "sampler_name", sampler_name)
         if "scheduler" in params:
             self.inject_node_value("3", "scheduler", params["scheduler"])
@@ -621,15 +618,14 @@ class NSFWFaceAdapter(WorkflowAdapter):
             self.inject_node_value("3", "cfg", params["cfg"])
         elif "cfg_scale" in params:
             self.inject_node_value("3", "cfg", params["cfg_scale"])
-        # Handle sampler: map "dpmpp_2m" + "karras" scheduler → "dpmpp_2m_karras"
+        # Handle sampler: ComfyUI uses separate sampler_name and scheduler
         sampler_name = params.get("sampler", "euler")
         scheduler = params.get("scheduler", "normal")
-        if sampler_name == "dpmpp_2m" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_karras"
-        elif sampler_name == "dpmpp_2m_sde" and scheduler == "karras":
-            sampler_name = "dpmpp_2m_sde_karras"
-        elif sampler_name == "euler" and scheduler == "normal":
-            sampler_name = "euler_a"  # Fallback to Euler a for Pony
+        # For Pony: DPM++ 2M Karras = dpmpp_2m + karras scheduler (separate params)
+        # Euler a = euler_ancestral (ComfyUI doesn't support "euler_a")
+        if sampler_name == "euler" and scheduler == "normal":
+            sampler_name = "euler_ancestral"  # Use euler_ancestral (ComfyUI doesn't support euler_a)
+        # dpmpp_2m and dpmpp_2m_sde are valid ComfyUI sampler names
         self.inject_node_value("3", "sampler_name", sampler_name)
         if "scheduler" in params:
             self.inject_node_value("3", "scheduler", params["scheduler"])
