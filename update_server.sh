@@ -28,8 +28,8 @@ sleep 2
 
 # Запускаем ComfyUI (должен быть первым)
 echo "   - Запуск ComfyUI (Port 8188)..."
-cd /workspace/ComfyUI_server
-source /workspace/ComfyUI/venv/bin/activate
+cd /workspace/ComfyUI
+source venv/bin/activate
 nohup python main.py --listen 0.0.0.0 --port 8188 > /workspace/logs/comfyui.log 2>&1 &
 sleep 10
 
