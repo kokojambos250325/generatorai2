@@ -471,11 +471,14 @@ class ClothesRemovalEnhancedAdapter(WorkflowAdapter):
         negative_prompt = params.get("negative_prompt", "clothes, clothing, dressed, censored, low quality")
         self.inject_node_value("7", "text", negative_prompt)
         
-        # Inject ControlNet strength for all three controls
+        # Inject ControlNet strength for all three controls (only if nodes exist)
         controlnet_strength = params.get("controlnet_strength", 0.8)
-        self.inject_node_value("16", "strength", controlnet_strength)  # OpenPose
-        self.inject_node_value("18", "strength", controlnet_strength)  # Depth
-        self.inject_node_value("20", "strength", controlnet_strength)  # Canny
+        if "17" in self.workflow:
+            self.inject_node_value("17", "strength", controlnet_strength)  # Canny
+        if "18" in self.workflow:
+            self.inject_node_value("18", "strength", controlnet_strength)  # Depth
+        if "19" in self.workflow:
+            self.inject_node_value("19", "strength", controlnet_strength)  # OpenPose
         
         # Inject inpaint denoise strength
         inpaint_denoise = params.get("inpaint_denoise", 0.75)

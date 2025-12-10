@@ -46,7 +46,7 @@ STYLE_CONFIG = {
         "model": "cyberrealisticPony_v14.safetensors",
         "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
         "prompt_prefix": "score_9, score_8_up, score_7_up, ",
-        "default_quality_profile": "pony_balanced",
+        "default_quality_profile": "balanced",
         "lora": None,
         "lora_strength": None
     },
@@ -55,7 +55,7 @@ STYLE_CONFIG = {
         "model": "cyberrealisticPony_v14.safetensors",
         "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
         "prompt_prefix": "score_9, score_8_up, score_7_up, luxury, elegant, professional photography, high-end aesthetic, sophisticated, glamorous, premium quality, ",
-        "default_quality_profile": "pony_high_quality",
+        "default_quality_profile": "high_quality",
         "lora": None,
         "lora_strength": None
     },
@@ -81,7 +81,7 @@ STYLE_CONFIG = {
         "model": "cyberrealisticPony_v14.safetensors",
         "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
         "prompt_prefix": "score_9, score_8_up, score_7_up, ",
-        "default_quality_profile": "pony_balanced",
+        "default_quality_profile": "balanced",
         "lora": None,
         "lora_strength": None
     }

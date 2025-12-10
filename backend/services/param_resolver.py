@@ -37,6 +37,23 @@ QUALITY_PROFILES = {
         "height": 1344,
         "sampler": "dpmpp_2m",
         "scheduler": "karras"
+    },
+    # Aliases for backward compatibility
+    "pony_balanced": {
+        "steps": 26,
+        "cfg": 7.5,
+        "width": 832,
+        "height": 1216,
+        "sampler": "euler",
+        "scheduler": "normal"
+    },
+    "pony_high_quality": {
+        "steps": 32,
+        "cfg": 8.0,
+        "width": 896,
+        "height": 1344,
+        "sampler": "dpmpp_2m",
+        "scheduler": "karras"
     }
 }
 
