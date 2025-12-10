@@ -10,20 +10,36 @@ STYLE_CONFIG = {
     "noir": {
         "name": "Noir cinematic",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
-        "prompt_prefix": "score_9, score_8_up, score_7_up, noir style, high contrast black and white, cinematic lighting, film noir aesthetic, dramatic shadows, moody atmosphere, vintage photography, ",
-        "default_quality_profile": "pony_balanced",
-        "lora": None,
-        "lora_strength": None
+        "negative_prompt": (
+            "low quality, bad anatomy, jpeg artifacts, cartoon, anime, 3d, "
+            "overexposed, underexposed, extra limbs, bad hands, bad face"
+        ),
+        "prompt_prefix": (
+            "noir style, high contrast black and white, cinematic lighting, film grain, "
+            "moody atmosphere, dramatic shadows, "
+        ),
+        "default_quality_profile": "balanced",
+        "default_sampler": "euler",
+        "default_steps": 26,
+        "default_cfg": 7.5,
+        "default_resolution": {"width": 832, "height": 1216}
     },
     "super_realism": {
-        "name": "Ultra realistic",
+        "name": "Super Realism",
         "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs",
-        "prompt_prefix": "score_9, score_8_up, score_7_up, hyperrealistic, ultra detailed, high quality photography, natural lighting, professional photo, sharp focus, realistic skin texture, ",
-        "default_quality_profile": "pony_high_quality",
-        "lora": None,
-        "lora_strength": None
+        "negative_prompt": (
+            "cartoon, anime, 3d, illustration, painting, cgi, lowres, bad anatomy, "
+            "bad hands, bad face, blurry, out of focus, plastic skin"
+        ),
+        "prompt_prefix": (
+            "ultra realistic, 8k, detailed skin texture, realistic lighting, "
+            "photorealistic, sharp focus, "
+        ),
+        "default_quality_profile": "high_quality",
+        "default_sampler": "dpmpp_2m",
+        "default_steps": 32,
+        "default_cfg": 8.0,
+        "default_resolution": {"width": 896, "height": 1344}
     },
     "realism": {
         "name": "Photorealism",
@@ -44,13 +60,21 @@ STYLE_CONFIG = {
         "lora_strength": None
     },
     "anime": {
-        "name": "Anime style",
-        "model": "cyberrealisticPony_v14.safetensors",
-        "negative_prompt": "score_6, score_5, score_4, worst quality, low quality, normal quality, lowres, bad anatomy, bad hands, signature, watermarks, ugly, imperfect eyes, skewed eyes, unnatural face, unnatural body, error, extra limb, missing limbs, realistic, photo",
-        "prompt_prefix": "score_9, score_8_up, score_7_up, anime style, highly detailed anime art, vibrant colors, cel shaded, anime aesthetic, manga style, detailed illustration, ",
-        "default_quality_profile": "pony_balanced",
-        "lora": None,
-        "lora_strength": None
+        "name": "Anime",
+        "model": "animeModelXL.safetensors",
+        "negative_prompt": (
+            "photo, realistic, 3d, lowres, bad anatomy, bad hands, blurry, "
+            "distorted face, extra limbs"
+        ),
+        "prompt_prefix": (
+            "anime illustration, highly detailed, clean lineart, vibrant colors, "
+            "beautiful anime style, "
+        ),
+        "default_quality_profile": "balanced",
+        "default_sampler": "euler",
+        "default_steps": 24,
+        "default_cfg": 7.0,
+        "default_resolution": {"width": 768, "height": 1152}
     },
     "chatgpt": {
         "name": "General purpose",

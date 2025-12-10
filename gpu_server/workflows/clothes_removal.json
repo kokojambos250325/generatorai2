@@ -4,111 +4,89 @@
       "image": "input_person.png",
       "upload": "image"
     },
-    "class_type": "LoadImage",
-    "_meta": {
-      "title": "Load Input Image"
-    }
+    "class_type": "LoadImage"
   },
   "3": {
     "inputs": {
       "seed": 42,
       "steps": 30,
       "cfg": 7.5,
-      "sampler_name": "dpmpp_2m_sde",
-      "scheduler": "karras",
-      "denoise": 0.75,
-      "model": ["16", 0],
-      "positive": ["6", 0],
+      "sampler_name": "euler",
+      "scheduler": "normal",
+      "denoise": 0.85,
+      "model": ["4", 0],
+      "positive": ["19", 0],
       "negative": ["7", 0],
       "latent_image": ["5", 0]
     },
-    "class_type": "KSampler",
-    "_meta": {
-      "title": "KSampler Inpaint"
-    }
+    "class_type": "KSampler"
   },
   "4": {
     "inputs": {
       "ckpt_name": "cyberrealisticPony_v14.safetensors"
     },
-    "class_type": "CheckpointLoaderSimple",
-    "_meta": {
-      "title": "Load Checkpoint"
-    }
+    "class_type": "CheckpointLoaderSimple"
   },
   "5": {
     "inputs": {
-      "pixels": ["11", 0],
-      "vae": ["4", 2]
+      "pixels": ["1", 0],
+      "vae": ["4", 2],
+      "mask": ["10", 1]
     },
-    "class_type": "VAEEncode",
-    "_meta": {
-      "title": "VAE Encode Masked"
-    }
+    "class_type": "VAEEncode"
   },
   "6": {
     "inputs": {
       "text": "nude, naked body, natural skin, photorealistic, high quality, detailed skin texture, beautiful anatomy",
       "clip": ["4", 1]
     },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "Positive Prompt"
-    }
+    "class_type": "CLIPTextEncode"
   },
   "7": {
     "inputs": {
       "text": "clothes, clothing, dressed, censored, low quality, blurry, deformed, bad anatomy",
       "clip": ["4", 1]
     },
-    "class_type": "CLIPTextEncode",
-    "_meta": {
-      "title": "Negative Prompt"
-    }
+    "class_type": "CLIPTextEncode"
   },
   "8": {
     "inputs": {
       "samples": ["3", 0],
       "vae": ["4", 2]
     },
-    "class_type": "VAEDecode",
-    "_meta": {
-      "title": "VAE Decode"
-    }
+    "class_type": "VAEDecode"
   },
   "9": {
     "inputs": {
       "filename_prefix": "clothes_removal",
       "images": ["8", 0]
     },
-    "class_type": "SaveImage",
-    "_meta": {
-      "title": "Save Result"
-    }
+    "class_type": "SaveImage"
   },
   "10": {
     "inputs": {
       "threshold": 0.7,
       "image": ["1", 0]
     },
-    "class_type": "PersonSegmentation",
-    "_meta": {
-      "title": "Person Segmentation"
-    }
+    "class_type": "PersonSegmentation"
   },
   "11": {
     "inputs": {
-      "expand": 10,
-      "blur": 5,
-      "image": ["1", 0],
-      "mask": ["10", 1]
+      "low_threshold": 100,
+      "high_threshold": 200,
+      "resolution": 1024,
+      "image": ["1", 0]
     },
-    "class_type": "MaskExpand",
-    "_meta": {
-      "title": "Mask Generation"
-    }
+    "class_type": "CannyEdgePreprocessor"
   },
   "12": {
+    "inputs": {
+      "resolution": 1024,
+      "image": ["1", 0]
+    },
+    "class_type": "MiDaS-DepthMapPreprocessor"
+  },
+  "13": {
     "inputs": {
       "detect_hand": "enable",
       "detect_body": "enable",
@@ -116,94 +94,51 @@
       "resolution": 1024,
       "image": ["1", 0]
     },
-    "class_type": "OpenposePreprocessor",
-    "_meta": {
-      "title": "OpenPose Detection"
-    }
-  },
-  "13": {
-    "inputs": {
-      "resolution": 1024,
-      "image": ["1", 0]
-    },
-    "class_type": "MiDaS-DepthMapPreprocessor",
-    "_meta": {
-      "title": "Depth Estimation"
-    }
+    "class_type": "OpenposePreprocessor"
   },
   "14": {
     "inputs": {
-      "low_threshold": 100,
-      "high_threshold": 200,
-      "resolution": 1024,
-      "image": ["1", 0]
+      "control_net_name": "control_v11p_sd15_canny.pth"
     },
-    "class_type": "CannyEdgePreprocessor",
-    "_meta": {
-      "title": "Canny Edge Detection"
-    }
+    "class_type": "ControlNetLoader"
   },
   "15": {
     "inputs": {
-      "control_net_name": "control_v11p_sd15_openpose.pth"
+      "control_net_name": "control_v11f1p_sd15_depth.pth"
     },
-    "class_type": "ControlNetLoader",
-    "_meta": {
-      "title": "ControlNet OpenPose Loader"
-    }
+    "class_type": "ControlNetLoader"
   },
   "16": {
     "inputs": {
-      "strength": 0.8,
-      "conditioning": ["18", 0],
-      "control_net": ["15", 0],
-      "image": ["12", 0]
+      "control_net_name": "control_v11p_sd15_openpose.pth"
     },
-    "class_type": "ControlNetApply",
-    "_meta": {
-      "title": "Apply OpenPose Control"
-    }
+    "class_type": "ControlNetLoader"
   },
   "17": {
     "inputs": {
-      "control_net_name": "control_v11f1p_sd15_depth.pth"
+      "strength": 0.8,
+      "conditioning": ["6", 0],
+      "control_net": ["14", 0],
+      "image": ["11", 0]
     },
-    "class_type": "ControlNetLoader",
-    "_meta": {
-      "title": "ControlNet Depth Loader"
-    }
+    "class_type": "ControlNetApply"
   },
   "18": {
     "inputs": {
       "strength": 0.8,
-      "conditioning": ["20", 0],
-      "control_net": ["17", 0],
-      "image": ["13", 0]
+      "conditioning": ["17", 0],
+      "control_net": ["15", 0],
+      "image": ["12", 0]
     },
-    "class_type": "ControlNetApply",
-    "_meta": {
-      "title": "Apply Depth Control"
-    }
+    "class_type": "ControlNetApply"
   },
   "19": {
     "inputs": {
-      "control_net_name": "control_v11p_sd15_canny.pth"
-    },
-    "class_type": "ControlNetLoader",
-    "_meta": {
-      "title": "ControlNet Canny Loader"
-    }
-  },
-  "20": {
-    "inputs": {
       "strength": 0.8,
-      "conditioning": ["6", 0],
-      "control_net": ["19", 0],
-      "image": ["14", 0]
+      "conditioning": ["18", 0],
+      "control_net": ["16", 0],
+      "image": ["13", 0]
     },
-    "class_type": "ControlNetApply",
-    "_meta": {
-      "title": "Apply Canny Control"
-    }
+    "class_type": "ControlNetApply"
   }
 }

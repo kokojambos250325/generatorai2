@@ -144,6 +144,8 @@ class ComfyUIClient:
                 modified_workflow["3"]["inputs"]["sampler_name"] = params["sampler"]
             if "scheduler" in params:
                 modified_workflow["3"]["inputs"]["scheduler"] = params["scheduler"]
+            if "denoise" in params:
+                modified_workflow["3"]["inputs"]["denoise"] = params["denoise"]
         
         # Inject image dimensions into EmptyLatentImage (node 5)
         if "5" in modified_workflow:

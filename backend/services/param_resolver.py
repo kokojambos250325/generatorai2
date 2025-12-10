@@ -8,12 +8,11 @@ Implements the parameter resolution logic from the design document.
 import logging
 import random
 from typing import Dict, Any, Optional
-from config import STYLE_CONFIG
+from backend.config import STYLE_CONFIG
 
 logger = logging.getLogger(__name__)
 
-# Import quality profiles from GPU server (shared configuration)
-# Since we can't cross-import, we define the mapping here
+# Quality profiles mapping
 QUALITY_PROFILES = {
     "fast": {
         "steps": 18,
@@ -37,23 +36,6 @@ QUALITY_PROFILES = {
         "width": 896,
         "height": 1344,
         "sampler": "dpmpp_2m",
-        "scheduler": "karras"
-    },
-    # Pony Diffusion optimized profiles
-    "pony_balanced": {
-        "steps": 30,
-        "cfg": 5.0,  # Recommended CFG for Pony
-        "width": 832,
-        "height": 1216,
-        "sampler": "dpmpp_sde",  # DPM++ SDE Karras
-        "scheduler": "karras"
-    },
-    "pony_high_quality": {
-        "steps": 40,
-        "cfg": 5.0,
-        "width": 896,
-        "height": 1152,
-        "sampler": "dpmpp_2m",  # DPM++ 2M Karras
         "scheduler": "karras"
     }
 }
@@ -116,12 +98,22 @@ class ParameterResolver:
             if extra_params.get("cfg_scale"):
                 # CRITICAL: Map cfg_scale → cfg for GPU server
                 final_params["cfg"] = extra_params["cfg_scale"]
+            elif extra_params.get("cfg"):
+                # Also support direct cfg parameter
+                final_params["cfg"] = extra_params["cfg"]
             if extra_params.get("sampler"):
                 final_params["sampler"] = extra_params["sampler"]
+            if extra_params.get("scheduler"):
+                final_params["scheduler"] = extra_params["scheduler"]
             if extra_params.get("width"):
                 final_params["width"] = extra_params["width"]
             if extra_params.get("height"):
                 final_params["height"] = extra_params["height"]
+            if extra_params.get("denoise"):
+                final_params["denoise"] = extra_params["denoise"]
+            if extra_params.get("seed") is not None:
+                # Handle seed separately (can be -1 for random)
+                pass  # Already handled below
         
         # Step 4: Add prompt with style prefix
         enhanced_prompt = style_config["prompt_prefix"] + prompt
